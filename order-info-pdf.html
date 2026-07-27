@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+<meta charset="utf-8">
+<title>itowa 注文情報 PDF（名札イメージ＝自動レイアウト）テンプレート</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Yuji+Syuku&display=swap" rel="stylesheet">
+<style>
+/* A4・Puppeteer(HTML→PDF)前提。実装ではS3テンプレHTML＋nunjucks差し込みに置換。 */
+@page{size:A4;margin:0}
+*{box-sizing:border-box}
+body{margin:0;background:#e9e9e9;font-family:"Noto Sans JP",sans-serif;color:#111}
+.page{width:210mm;min-height:297mm;background:#fff;margin:16px auto;padding:16mm 14mm;position:relative}
+.crop{position:absolute;width:14px;height:14px;border:1.4px solid #111}
+.crop.tl{top:6mm;left:6mm;border-right:none;border-bottom:none}
+.crop.tr{top:6mm;right:6mm;border-left:none;border-bottom:none}
+.crop.bl{bottom:6mm;left:6mm;border-right:none;border-top:none}
+.crop.br{bottom:6mm;right:6mm;border-left:none;border-top:none}
+.head{display:flex;justify-content:space-between;align-items:flex-start}
+.head .aisatsu{font-weight:700;font-size:14px;margin-top:6px}
+.title{text-align:center;font-family:"Noto Serif JP",serif;font-size:26px;font-weight:700;margin:2px 0 6px}
+.subtitle{text-align:center;font-size:13.5px;margin-bottom:16px}
+.sec-h{font-weight:700;font-size:16.5px;margin:0 0 8px}
+.sec-h .sq{margin-right:4px}
+.row{display:flex;font-size:15px;line-height:2.0}
+.row .k{width:104px;flex-shrink:0;font-weight:600}
+.row .k.wide{width:112px}
+.row .sep{width:10px;flex-shrink:0}
+.order-top{display:flex;gap:20px;margin-bottom:6px}
+.order-top .otl{flex:1}
+.order-top .otr{width:250px;padding-top:26px}
+.main{display:flex;gap:16px}
+.main-left{flex:1;min-width:0}
+.main-right{width:250px;flex-shrink:0}
+.nafuda-label{text-align:center;font-weight:700;font-size:15px;margin:2px 0 6px}
+.fuda-box{border:1.5px solid #111;aspect-ratio:95/280;height:158mm;width:auto;margin:0 auto;display:flex;align-items:center;justify-content:center;padding:6mm 4mm;overflow:hidden}
+/* 供花札 自動レイアウト（縦書き。管理/参列モックと同一ロジック） */
+.fuda-body{display:flex;flex-direction:column;align-items:center;gap:16px}
+.fuda-row{display:flex;flex-direction:row-reverse;align-items:flex-start;justify-content:center;gap:14px}
+.fuda-col{display:flex;flex-direction:column;align-items:center;color:#111;font-family:"Noto Serif JP","Yu Mincho",serif}
+.addr-big{font-size:17px;font-weight:600}
+.addr-big .addr2{display:inline-block;margin-top:2px}
+.biko-wrap{margin-top:14px}
+.biko-label{font-size:13px;font-weight:600;margin:0 0 6px 6px}
+.biko-box{border:1.3px solid #111;min-height:22mm;padding:8px 12px;font-size:14px;line-height:2;font-family:"Noto Serif JP",serif}
+.mono{font-family:"Noto Sans JP",sans-serif}
+.ptoggle{max-width:210mm;margin:10px auto 0;padding:8px 12px;background:#3a3550;color:#fff;border-radius:8px;font-size:12.5px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ptoggle b{margin-right:4px}
+.ptoggle button{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:#fff;border-radius:6px;padding:6px 11px;font-size:12px;cursor:pointer;font-family:inherit}
+.ptoggle button:hover{background:rgba(255,255,255,.25)}
+@media print{body{background:#fff}.page{margin:0;box-shadow:none}.no-print{display:none!important}}
+</style></head>
+<body>
+<div class="ptoggle no-print"><b>名札プレビュー切替</b><span style="opacity:.7">（印刷には出ません）</span>
+  <button onclick="setFuda('single')">単名</button>
+  <button onclick="setFuda('renmei')">連名（3名・別姓）</button>
+  <button onclick="setFuda('couple')">夫婦＋子供（名のみ）</button>
+  <button onclick="setFuda('corp')">法人（会社名＋肩書＋氏名）</button>
+</div>
+<div class="page">
+  <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+  <!-- ===== ヘッダー ===== -->
+  <div class="head">
+    <div class="logo"><svg viewBox="0 0 98 20" width="150" fill="#111" xmlns="http://www.w3.org/2000/svg"><g clipPath="url(#itowa-logo-clip)">
+      <path d="M90.6904 6.92796C90.9557 6.89846 91.3842 6.8771 91.656 6.88507C93.4009 6.93623 94.9363 7.50245 96.1655 8.73654C98.1306 10.7106 97.9899 12.4147 97.9846 14.9953L97.9733 18.9019C97.1756 18.9402 95.785 18.9294 95.004 18.8903L95.0004 17.545C94.4028 18.1317 94.16 18.3451 93.4537 18.7959C92.0851 19.5538 90.4334 19.3685 89.038 18.778C84.3369 16.789 83.8104 10.4614 88.1692 7.77919C89.0007 7.26747 89.7425 7.10756 90.6904 6.92796ZM92.0744 16.2737C93.2359 16.1152 94.2217 15.3392 94.6503 14.2453C95.0782 13.1513 94.8829 11.9107 94.1393 11.0024C93.395 10.094 92.2193 9.66011 91.0655 9.86814C89.333 10.1805 88.1674 11.8234 88.4422 13.566C88.7164 15.3086 90.3307 16.5116 92.0744 16.2737Z" />
+      <path d="M53.8306 6.80125C57.2777 6.31017 60.4713 8.71002 60.9669 12.1648C61.4625 15.6196 59.0736 18.8243 55.6277 19.3271C52.1735 19.8312 48.9671 17.4297 48.4701 13.9666C47.9731 10.5035 50.3746 7.29353 53.8306 6.80125ZM55.2123 16.233C56.9631 15.9603 58.1614 14.3155 57.8878 12.5605C57.6142 10.8055 55.9719 9.60574 54.2217 9.88165C52.4732 10.1572 51.2779 11.8005 51.5515 13.5533C51.8245 15.3061 53.4632 16.5054 55.2123 16.233Z" />
+      <path d="M79.5105 7.24456C80.1277 7.16158 82.3498 7.2006 82.976 7.26723C82.665 7.93469 82.4584 8.71317 82.1284 9.38045C81.951 9.73935 81.7795 10.1185 81.6275 10.489C80.9017 12.341 80.1675 14.1982 79.3775 16.0235C78.9704 16.9647 78.5484 17.9335 78.2214 18.9055C77.4759 18.9393 76.3328 18.9276 75.5898 18.8923C75.2782 17.9498 74.8663 17.058 74.4947 16.139C74.0425 15.0196 73.6496 13.8454 73.1499 12.749C72.9219 13.2187 72.6685 14.0261 72.4537 14.5437C71.8762 15.9339 71.2097 17.4781 70.739 18.9065C69.9544 18.9371 68.8873 18.9248 68.1027 18.8967C67.8196 17.9657 67.3869 17.2067 67.0379 16.3264C66.2764 14.4045 65.5292 12.5206 64.6989 10.6287C64.4087 9.96874 63.5641 7.96212 63.3973 7.2965L63.5344 7.22624C64.4793 7.2034 65.8895 7.16538 66.8064 7.2445C66.8688 7.35474 67.3922 8.65986 67.4664 8.8579C68.0955 10.5385 68.8267 12.3067 69.4185 13.9945C69.5894 13.3503 70.0339 12.4409 70.2915 11.7856L72.0275 7.25247C72.7498 7.18799 73.4769 7.18591 74.1998 7.24611C75.22 9.44113 75.9073 11.7512 76.8884 13.8791C77.6653 12.1868 78.2321 10.4025 78.9021 8.66581C79.0867 8.18758 79.247 7.68538 79.5105 7.24456Z" />
+      <path d="M38.8668 3.30205C39.8013 3.29593 40.7212 3.28302 41.6551 3.32537C41.6735 4.60421 41.661 5.90684 41.6611 7.18751C42.6966 7.22975 43.9112 7.15545 44.9171 7.24944C44.8705 8.04207 44.8995 9.13667 44.8962 9.95131C44.0548 10.0138 42.5746 9.9782 41.6877 9.992C41.6084 11.2234 41.5113 13.6688 42.1121 14.6807C42.7874 15.8185 43.7508 16.0618 44.9035 16.3951L44.9103 17.8804L44.89 19.2707C44.7721 19.2722 44.6541 19.2729 44.5362 19.273C42.3189 19.2743 40.2855 18.1804 39.2359 16.1968C38.2286 14.2933 38.4585 12.0852 38.4602 9.99599C37.9936 9.98837 37.527 9.97802 37.0606 9.96487C37.0332 9.08509 37.0503 8.15492 37.0545 7.27074C37.5007 7.2539 37.9938 7.25908 38.4441 7.2542C38.4964 6.26984 38.3749 4.22794 38.4954 3.40324C38.6422 3.28641 38.6585 3.31865 38.8668 3.30205Z" />
+      <path d="M18.8975 11.7257L18.8936 11.7037C18.7197 10.7565 17.9783 9.14791 17.1163 8.62661C14.5553 7.07764 11.187 9.38872 9.92643 11.6563C9.85995 11.7754 9.81532 11.8796 9.68837 11.9403C9.61246 11.6272 10.208 10.5613 10.391 10.2355C11.8273 7.67943 15.1446 6.00422 17.8765 7.59953C19.0352 8.27622 19.5291 9.22358 20.0437 10.4383C20.9402 10.8705 21.4702 11.0823 22.1717 11.8202C24.4981 14.2672 23.6416 18.5653 20.4523 19.7598C18.6527 20.4338 17.0336 19.5142 15.3457 18.961C14.6292 18.7185 13.8857 18.5657 13.1318 18.5058C12.1927 18.4284 11.1623 18.5156 10.226 18.6432C9.66487 18.7196 9.73526 18.8845 9.01735 18.8568C8.64605 18.8444 8.63008 18.8735 8.36039 18.6476C10.144 17.9469 12.0946 17.4296 14.0269 17.5137C14.7271 17.5477 15.4218 17.6554 16.0996 17.8347C17.8717 18.3097 19.1718 19.0547 20.7974 17.7483C22.7915 16.1457 22.1451 13.0432 19.8771 12.1093C19.5477 11.9736 19.2222 11.8566 18.8975 11.7257Z" />
+      <path d="M30.8765 7.22565C31.7719 7.20429 33.1747 7.16509 34.0363 7.25242C33.9771 7.81316 34.022 9.53953 34.0226 10.1969L34.0267 16.2688C34.0268 16.706 34.0515 18.5559 33.9844 18.9024C33.0996 18.9216 31.6529 18.9564 30.8073 18.8739C30.728 15.9815 30.8408 13.0466 30.7928 10.1496C30.7856 9.71514 30.7503 7.43719 30.8765 7.22565Z" />
+      <path d="M4.94315 6.10339C4.90713 6.60803 5.20056 6.74402 5.13361 7.38288C5.07224 7.96866 4.56135 8.20983 4.81454 8.7228C4.49802 9.86791 4.57067 10.4093 4.63536 11.5859C3.34139 12.1298 2.51244 12.3265 1.86599 13.77C1.15289 15.3623 1.68592 17.5089 3.39154 18.1927C3.56063 18.2605 3.87935 18.3307 4.01022 18.3971C4.49808 18.5989 4.80611 18.4021 5.01989 18.7808C5.01562 18.9484 5.01657 18.9816 4.93098 19.1231C5.54847 19.1485 5.69999 18.6541 6.27979 18.7139C6.18898 18.7914 5.89199 18.9851 5.77952 19.0471C4.92273 19.5111 3.91828 19.6186 2.98309 19.3466C-0.581755 18.2725 -0.826754 12.9257 2.10749 11.0157C2.41623 10.8147 2.68224 10.6595 3.00873 10.488C3.06043 10.1617 3.07081 9.74203 3.12642 9.3848C3.35409 7.92303 3.92172 7.1282 4.94315 6.10339Z" />
+      <path d="M7.73246 -0.0309325C8.83134 -0.130338 9.80611 0.673238 9.9209 1.77313C10.0357 2.87302 9.24792 3.86143 8.1523 3.99213C7.42959 4.07833 6.71661 3.76779 6.28631 3.17945C5.85602 2.5911 5.77513 1.81608 6.07461 1.15123C6.37409 0.486323 7.0076 0.0346243 7.73246 -0.0309325Z" />
+      <path d="M17.6115 2.29628C18.6622 2.21525 19.5782 3.0064 19.6536 4.06C19.729 5.11361 18.935 6.02766 17.8835 6.0978C16.8395 6.1674 15.9357 5.37858 15.8609 4.33264C15.7861 3.28671 16.5684 2.37664 17.6115 2.29628Z" />
+      <path d="M32.0599 2.34363C33.0648 2.16058 34.0278 2.82793 34.2119 3.83496C34.396 4.84199 33.7316 5.8082 32.7272 5.99423C31.7207 6.18061 30.7542 5.51302 30.5697 4.50385C30.3853 3.49474 31.0528 2.52703 32.0599 2.34363Z" />
+      <path d="M4.94315 6.10339C7.43179 4.21646 10.7484 4.46631 12.6711 7.02071L12.8933 7.31863C11.3264 6.23563 10.2468 5.4389 8.09972 5.83896C6.97526 6.0574 5.98262 6.71256 5.33819 7.66164C5.15806 7.92803 4.90392 8.40823 4.81454 8.7228C4.56135 8.20983 5.07224 7.96866 5.13361 7.38288C5.20056 6.74402 4.90713 6.60803 4.94315 6.10339Z" />
+      <path d="M4.01022 18.3971C5.7543 18.289 6.91306 17.6676 8.2189 16.5018C8.35226 16.3827 8.43458 16.1571 8.57945 16.0549L8.59631 16.0428C8.60871 16.0347 8.62112 16.0266 8.63352 16.0185L8.70142 16.0377C8.41665 16.9304 7.12281 18.2423 6.27979 18.7139C5.69999 18.6541 5.54847 19.1485 4.93098 19.1231C5.01657 18.9816 5.01562 18.9484 5.01989 18.7808C4.80611 18.4021 4.49808 18.5989 4.01022 18.3971Z" />
+      <path d="M9.01735 18.8568C8.60789 18.972 8.16542 19.1003 7.73649 19.0226C7.73436 19.0255 8.34615 18.653 8.36039 18.6476C8.63008 18.8735 8.64605 18.8444 9.01735 18.8568Z" />
+    </g><defs><clipPath id="itowa-logo-clip"><rect width="98" height="20" fill="white"/></clipPath></defs></svg></div>
+    <div class="aisatsu">関係者各位宛</div>
+  </div>
+  <div class="title">注文情報</div>
+  <div class="subtitle">下記のご注文を承りましたので、ご確認/ご手配をお願い申し上げます</div>
+
+  <!-- ===== ご注文内容（左：番号/品/価格  右：商品コード/支払方法） ===== -->
+  <div class="sec-h"><span class="sq">■</span>ご注文内容</div>
+  <div class="order-top">
+    <div class="otl">
+      <div class="row"><span class="k">ご注文番号</span><span class="sep">：</span><span class="mono">{{ orderNumber }}</span></div>
+      <div class="row"><span class="k">ご注文品</span><span class="sep">：</span><span>{{ productName }}</span></div>
+      <div class="row"><span class="k">税込価格</span><span class="sep">：</span><span class="mono">{{ priceText }}</span></div>
+    </div>
+    <div class="otr">
+      <div class="row"><span class="k">商品コード</span><span class="sep">：</span><span class="mono">{{ productCode }}</span></div>
+      <div class="row" style="margin-top:14px"><span class="k">支払方法</span><span class="sep">：</span><span>{{ paymentMethod }}</span></div>
+    </div>
+  </div>
+
+  <!-- ===== 本体（左：お届け先＋ご注文者  右：名札イメージ） ===== -->
+  <div class="main">
+    <div class="main-left">
+      <div class="sec-h" style="margin-top:10px"><span class="sq">■</span>お届け先情報</div>
+      <div class="row"><span class="k">葬儀社名</span><span class="sep">：</span><span>{{ funeralCompany }}</span></div>
+      <div class="row"><span class="k">会場名</span><span class="sep">：</span><span>{{ hallName }}</span></div>
+      <div class="row"><span class="k">部屋名</span><span class="sep">：</span><span>{{ roomName }}</span></div>
+      <div class="row"><span class="k">故人名</span><span class="sep">：</span><span>{{ deceasedName }}</span></div>
+      <div class="row"><span class="k">喪主名</span><span class="sep">：</span><span>{{ chiefMourner }}</span></div>
+      <div class="row"><span class="k">通夜式</span><span class="sep">：</span><span>{{ vigilDateTime }}</span></div>
+      <div class="row"><span class="k">葬儀式</span><span class="sep">：</span><span>{{ funeralDateTime }}</span></div>
+      <div class="row addr-big"><span class="k">会場住所</span><span class="sep">：</span><span id="hall-addr"></span></div>
+      <div class="row"><span class="k">会場電話番号</span><span class="sep">：</span><span class="mono">{{ hallPhone }}</span></div>
+
+      <div class="sec-h" style="margin-top:12px"><span class="sq">■</span>ご注文者</div>
+      <div class="row"><span class="k">法人名</span><span class="sep">：</span><span>{{ ordererCompany }}</span></div>
+      <div class="row"><span class="k">お名前</span><span class="sep">：</span><span>{{ ordererName }}</span></div>
+      <div class="row"><span class="k">郵便番号</span><span class="sep">：</span><span class="mono">{{ ordererZip }}</span></div>
+      <div class="row"><span class="k">住所</span><span class="sep">：</span><span>{{ ordererAddress }}</span></div>
+      <div class="row"><span class="k">電話番号</span><span class="sep">：</span><span class="mono">{{ ordererPhone }}</span></div>
+    </div>
+    <div class="main-right">
+      <div class="nafuda-label">＜名札イメージ＞</div>
+      <div class="fuda-box"><div id="fuda"></div></div>
+    </div>
+  </div>
+
+  <!-- ===== 名札備考（全幅） ===== -->
+  <div class="biko-wrap">
+    <div class="biko-label">名札備考</div>
+    <div class="biko-box" id="biko">{{ nafudaNote }}</div>
+  </div>
+</div>
+
+<script>
+/* ==== サンプルデータ（実装では nunjucks コンテキストで差し込み）==== */
+const DATA={
+  orderNumber:'20260726000002-1', productName:'供花（追悼）１基', priceText:'¥55,000-',
+  productCode:'0007', paymentMethod:'クレジットカード',
+  funeralCompany:'いとわ葬祭', hallName:'鶴舞会場', roomName:'', deceasedName:'糸和 花子', chiefMourner:'糸和　太郎',
+  vigilDateTime:'2026年7月28日 火曜日 18時00分より', funeralDateTime:'2026年7月29日 水曜日 12時00分より',
+  hallAddress1:'愛知県名古屋市昭和区鶴舞', hallAddress2:'1-2-32　STATION Ai 063', hallPhone:'050-8884-4987',
+  ordererCompany:'', ordererName:'名札 テスト', ordererZip:'4660064', ordererAddress:'愛知県名古屋市昭和区鶴舞 123', ordererPhone:'09017845550',
+  nafudaNote:'旧漢字などの備考をここに反映する。',
+  /* 名札（供花札）構造データ。個人/連名/法人に対応。 */
+  nafuda:{kind:'individual',withRelation:false,names:[{relation:'',name:'名札 テスト',isCouple:false}],corp:{type:'株式会社',company:'',title:'',name:''}}
+};
+// nunjucks風プレースホルダをサンプル値へ（プレビュー用。実装では nunjucks が置換）
+document.querySelectorAll('.row span:last-child, #biko').forEach(el=>{
+  const m=(el.textContent||'').match(/\{\{\s*(\w+)\s*\}\}/);
+  if(m&&DATA[m[1]]!==undefined)el.textContent=DATA[m[1]];
+});
+
+/* ===== 供花札 自動レイアウト（縦書き）===== */
+function esc(x){return (x==null?'':String(x)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function splitSurname(nm){const g=Array.from(nm);const idx=g.findIndex(ch=>ch===' '||ch==='　');if(idx>0)return [idx,g.slice(0,idx).join(''),g.slice(idx+1).join('')];return [0,'',nm];}
+const DASH=['ー','ｰ','－','‐','‑','‒','–','—','―','−','〜','～','~','-'];
+function glyphs(str,fp){return Array.from(str).map(ch=>{if(ch===' '||ch==='　')return `<span style="display:block;height:${Math.round(fp*0.5)}px"></span>`;const rot=DASH.includes(ch)?'transform:rotate(90deg);':'';return `<span style="display:block;font-size:${fp}px;line-height:1.15;${rot}">${esc(ch)}</span>`;}).join('');}
+function spacer(px){return px>0?`<span style="display:block;height:${Math.round(px)}px"></span>`:'';}
+function fudaHtml(l){
+  const bodyH=470,innerW=159,LH=1.2;
+  const clen=x=>Array.from(x).length;
+  let specs=[];
+  if(l.kind==='individual'){
+    const es=l.names.filter(n=>n.name.trim()).map(n=>{const nm=n.name.trim();const r=n.isCouple?[0,'',nm]:splitSurname(nm);return {relation:l.withRelation?(n.relation||'').trim():'',surnameLen:r[0],surname:r[1],given:r[2]};});
+    const ws=es.filter(e=>e.surnameLen>0);const maxLen=ws.length?Math.max(...ws.map(e=>e.surnameLen)):0;
+    specs=es.map(e=>{let head=e.surname,tail=e.given,gapU=0;if(e.surnameLen>0)gapU=0.5+(maxLen-e.surnameLen);else if(maxLen>0){head='';gapU=maxLen+0.5;}const relU=l.withRelation?(e.relation?clen(e.relation)*0.44+0.3:0.44+0.3):0;return {t:'name',relation:e.relation,head,gapU,tail,units:relU+clen(head)+gapU+clen(tail)};});
+  }else{
+    const c=l.corp;const type=c.type==='（記載なし）'?'':c.type;const title=(c.title||'').trim();const org=type+c.company.trim();const name=c.name.trim();
+    if(org)specs.push({t:'org',text:org,units:clen(org)*0.72});
+    if(name||title)specs.push({t:'cname',title,name,units:(title?clen(title)*0.44+0.3:0)+clen(name)});
+  }
+  if(!specs.length)return '<div class="fuda-col" style="color:#bbb;font-size:16px">名札未入力</div>';
+  let rows;
+  if(l.kind==='individual'){const N=specs.length;if(N<=4)rows=[specs];else{const top=Math.ceil(N/2);rows=[specs.slice(0,top),specs.slice(top)];}}else rows=[specs];
+  const numRows=rows.length,maxColUnits=Math.max(1,...specs.map(s=>s.units)),maxCols=Math.max(...rows.map(r=>r.length));
+  let NF=Math.round(Math.min(bodyH*0.92/(numRows*maxColUnits*LH),innerW/(maxCols*1.35)));NF=Math.max(9,Math.min(80,NF));
+  const OF=Math.round(NF*0.72),TF=Math.round(NF*0.44);
+  const rc=s=>{
+    if(s.t==='org')return `<div class="fuda-col">${glyphs(s.text,OF)}</div>`;
+    if(s.t==='cname'){let inn='';if(s.title)inn+=glyphs(s.title,TF)+spacer(NF*0.3);inn+=glyphs(s.name,NF);return `<div class="fuda-col">${inn}</div>`;}
+    let inn='';
+    if(l.kind==='individual'&&l.withRelation)inn+=(s.relation?glyphs(s.relation,TF)+spacer(NF*0.3):spacer(Math.round(TF*LH+NF*0.3)));
+    if(s.head)inn+=glyphs(s.head,NF);
+    if(s.gapU>0)inn+=spacer(s.gapU*NF*LH);
+    inn+=glyphs(s.tail,NF);
+    return `<div class="fuda-col">${inn}</div>`;
+  };
+  return `<div class="fuda-body">${rows.map(r=>`<div class="fuda-row">${r.map(rc).join('')}</div>`).join('')}</div>`;
+}
+const _corp={type:'株式会社',company:'',title:'',name:''};
+const FUDA_SAMPLES={
+  single:{kind:'individual',withRelation:false,names:[{relation:'',name:'名札 テスト',isCouple:false}],corp:_corp},
+  renmei:{kind:'individual',withRelation:false,names:[{relation:'',name:'山田 太郎',isCouple:false},{relation:'',name:'佐藤 花子',isCouple:false},{relation:'',name:'鈴木 一郎',isCouple:false}],corp:_corp},
+  couple:{kind:'individual',withRelation:false,names:[{relation:'',name:'山田 太郎',isCouple:false},{relation:'',name:'花子',isCouple:true},{relation:'',name:'一郎',isCouple:true}],corp:_corp},
+  corp:{kind:'corporate',withRelation:false,names:[{relation:'',name:'',isCouple:false}],corp:{type:'株式会社',company:'いとわ',title:'代表取締役',name:'坂元 充'}},
+};
+function setFuda(k){DATA.nafuda=FUDA_SAMPLES[k];document.getElementById('hall-addr').innerHTML=esc(DATA.hallAddress1)+'<br><span class="addr2">'+esc(DATA.hallAddress2)+'</span>';
+document.getElementById('fuda').innerHTML=fudaHtml(DATA.nafuda);}
+document.getElementById('fuda').innerHTML=fudaHtml(DATA.nafuda);
+</script>
+</body></html>

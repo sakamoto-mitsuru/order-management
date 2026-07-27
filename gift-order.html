@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>itowa 追悼ページ｜贈る（新型 memorial・レスポンシブ）モック</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Shippori+Mincho:wght@500;600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{--bg:#f5f0e8;--paper:#ffffff;--ink:#3a3228;--muted:#9a8f7e;--line:#eeeeee;--primary:#635e7a;--gold:#b0925a;--soft:#f5f0e8;--green:#2a6040}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:"Noto Sans JP",sans-serif;color:var(--ink)}
+.app{max-width:940px;margin:0 auto;background:var(--bg);min-height:100vh;box-shadow:0 0 40px rgba(0,0,0,.06);display:flex;flex-direction:column}
+.mser{font-family:"Shippori Mincho",serif}
+.mhead{background:#fff;color:var(--ink);height:56px;padding:0 16px;position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center}
+.brand svg{display:block}
+.mhead-acc{background:none;border:none;color:#4a4a4a;cursor:pointer;padding:4px;display:flex;align-items:center}
+.mhead-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:"Shippori Mincho",serif;font-size:15px;color:var(--ink);white-space:nowrap;max-width:62%;overflow:hidden;text-overflow:ellipsis;text-align:center;pointer-events:none}
+.tabs{display:flex;gap:2px;max-width:640px;margin:0 auto}
+.tabs a{flex:1;text-align:center;color:rgba(255,255,255,.7);font-size:13px;padding:10px 0;border-bottom:2px solid transparent;cursor:pointer}
+.tabs a.on{color:#fff;border-bottom-color:var(--gold);font-weight:600}
+.stepper{position:sticky;top:56px;z-index:20;background:var(--paper);border-bottom:1px solid var(--line);display:flex;padding:11px 8px;max-width:640px;margin:0 auto;width:100%}
+.stepper .st{flex:1;text-align:center;font-size:11.5px;color:var(--muted)}
+.stepper .st .n{width:26px;height:26px;border-radius:50%;background:var(--line);color:var(--muted);display:flex;align-items:center;justify-content:center;margin:0 auto 3px;font-size:13px;font-weight:700}
+.stepper .st.on .n{background:var(--primary);color:#fff}
+.stepper .st.done .n{background:var(--green);color:#fff}
+.stepper .st.on{color:var(--primary);font-weight:700}
+.content{flex:1;padding:18px 20px 130px;max-width:720px;margin:0 auto;width:100%}
+.obi{background:linear-gradient(180deg,#fbfaf7,#f4f0e8);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:18px;display:flex;gap:14px;align-items:center}
+.obi .ph{width:66px;height:82px;border-radius:8px;background:#e8e3d8;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#c3bba8;font-size:26px}
+.obi .nm{font-family:"Shippori Mincho",serif;font-size:17px;margin-bottom:5px}
+.obi .meta{font-size:12px;color:var(--muted);line-height:1.8}
+.sec-lead{font-family:"Shippori Mincho",serif;font-size:17px;margin:4px 0 14px;display:flex;align-items:center;gap:8px}
+.sec-lead i{color:var(--gold)}
+.chips{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.chip{padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;cursor:pointer;color:var(--muted)}
+.chip.on{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+.prod-list{display:flex;flex-direction:column;gap:12px}
+.pcard{border:1px solid var(--line);border-radius:14px;background:#fff;cursor:pointer;transition:.15s;display:flex;gap:12px;padding:12px;align-items:stretch}
+.pcard:hover{box-shadow:0 6px 18px rgba(0,0,0,.08);transform:translateY(-1px)}
+.pcard-img{width:96px;flex-shrink:0;border-radius:8px;background:#f3efe8;overflow:hidden}
+.pcard-img img{width:100%;height:100%;object-fit:cover}
+.pcard-body{display:flex;flex-direction:column;flex:1;min-width:0}
+.pcat{font-size:11px;color:var(--gold);margin-bottom:3px}
+.pnm{font-size:14.5px;font-weight:600;line-height:1.45;margin-bottom:4px}
+.pcode{font-size:11px;color:var(--muted)}
+.pcard-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:10px}
+.pprice{font-size:17px;font-weight:700;font-family:"Shippori Mincho",serif}
+.addbtn2{border:1px solid var(--primary);background:#fff;color:var(--primary);border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.addbtn2:hover{background:var(--primary);color:#fff}
+.deadline{font-size:11.5px;color:#a9683b;background:#faf1e8;border-radius:6px;padding:3px 9px;display:inline-block;margin-bottom:12px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+.toggle{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.toggle button{border:none;background:#fff;padding:10px 20px;font-size:14px;cursor:pointer;color:var(--muted)}
+.toggle button.on{background:var(--primary);color:#fff;font-weight:600}
+.fld{margin-bottom:13px}
+.fld label{display:block;font-size:12.5px;color:#555;margin-bottom:5px;font-weight:500}
+.fld input,.fld select{width:100%;border:1px solid #d6d0c4;border-radius:9px;padding:11px 12px;font-size:15px;font-family:inherit;background:#fff}
+.fld input:focus,.fld select:focus{outline:none;border-color:var(--primary)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.qchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.qchip{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--soft);font-size:12px;cursor:pointer}
+.qchip:hover{background:var(--primary);color:#fff}
+.qchip.on{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+.namerow{border:1px solid var(--line);border-radius:10px;padding:11px;margin-bottom:10px;background:#fcfbf8}
+.addbtn{border:1px dashed #c9c1b0;background:#fff;border-radius:9px;padding:10px;width:100%;font-size:13px;color:var(--primary);cursor:pointer}
+.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 13px;font-size:12px;cursor:pointer}
+.badge{margin-left:auto;font-size:11px;padding:3px 9px;border-radius:999px;font-weight:600}
+.lbl-2col{display:flex;gap:18px;align-items:flex-start}
+.lbl-form{flex:1;min-width:0}
+.lbl-fuda-col{flex-shrink:0;position:sticky;top:110px;align-self:flex-start}
+.fuda-wrap-s{display:flex;flex-direction:column;align-items:center}
+.fuda{aspect-ratio:95/280;width:auto;height:274px;background:#fff;border:1px solid #c8b88a;padding:13px 8px 15px;display:flex;flex-direction:column;align-items:center;font-family:"Yuji Syuku","Yu Mincho","Noto Serif JP",serif;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.fuda-hd{display:flex;gap:6px;margin-bottom:13px}
+.fuda-hd span{font-size:23px;line-height:1;color:#1a1a1a}
+.fuda-body{display:flex;flex-direction:column;align-items:center;gap:12px;flex:1}
+.fuda-row{display:flex;flex-direction:row-reverse;align-items:flex-start;justify-content:center;gap:9px}
+.fuda-col{display:flex;flex-direction:column;align-items:center;color:#1a1a1a}
+.fuda-note{font-size:10.5px;color:#8a7f66;margin-top:10px;text-align:left;width:210px;line-height:1.65;background:#fbf7ef;border:1px solid #ece2cc;border-radius:8px;padding:9px 11px}
+.pay-opt{border:1px solid var(--line);border-radius:12px;padding:15px;margin-bottom:11px;display:flex;gap:12px;align-items:flex-start;cursor:pointer;background:#fff}
+.pay-opt.on{border-color:var(--primary);box-shadow:0 0 0 2px rgba(74,69,96,.15)}
+.pay-opt .radio{width:20px;height:20px;border-radius:50%;border:2px solid #c9c1b0;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center}
+.pay-opt.on .radio{border-color:var(--primary)}
+.pay-opt.on .radio:after{content:"";width:10px;height:10px;border-radius:50%;background:var(--primary)}
+.pay-opt .t{font-weight:600;font-size:14.5px}
+.pay-opt .d{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.6}
+.sumrow{display:flex;justify-content:space-between;font-size:13.5px;padding:8px 0;border-bottom:1px dashed var(--line);gap:10px}
+.sumrow span:first-child{flex:1}
+.sumrow.total{font-size:18px;font-weight:700;border-bottom:none;padding-top:13px;font-family:"Shippori Mincho",serif}
+.botbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:940px;background:rgba(255,255,255,.97);backdrop-filter:blur(6px);border-top:1px solid var(--line);z-index:25}
+.botbar-inner{max-width:720px;margin:0 auto;padding:13px 20px;display:flex;gap:12px;align-items:center}
+.botbar .tt{font-size:11px;color:var(--muted)}
+.botbar .tv{font-size:19px;font-weight:700;font-family:"Shippori Mincho",serif}
+.btn{border:none;border-radius:11px;padding:14px 20px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-p{background:var(--primary);color:#fff;flex:1}
+.btn-p:disabled{background:#cfcabc;cursor:not-allowed}
+.btn-g{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.hint{font-size:12px;color:var(--muted);line-height:1.7}
+.complete{text-align:center;padding:50px 20px}
+.complete .ico{width:80px;height:80px;border-radius:50%;background:#eaf3ec;color:var(--green);display:flex;align-items:center;justify-content:center;font-size:38px;margin:0 auto 20px}
+.legacy-note{font-size:11.5px;color:#9a6a3a;background:#fbf3e9;border:1px solid #efdcc4;border-radius:8px;padding:9px 11px;margin-bottom:14px;line-height:1.6}
+.urlbar{font-size:11px;color:#b7b1a3;text-align:center;padding:7px;border-bottom:1px solid var(--line);background:#f7f4ee;font-family:monospace;word-break:break-all}
+.topnav{display:flex;background:#fff;border-bottom:1px solid var(--line)}
+.topnav a{flex:1;text-align:center;font-size:14px;padding:12px 0;color:var(--muted);text-decoration:none;cursor:pointer}
+.topnav a.on{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--ink)}
+.decname{text-align:center;font-size:13px;color:var(--ink);padding:9px 8px;background:var(--paper);border-bottom:1px solid var(--line)}
+.decname b{font-family:"Shippori Mincho",serif;font-size:15px}
+.botnav{display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:940px;background:#fff;border-top:1px solid var(--line);z-index:40;height:56px}
+.botnav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;letter-spacing:.4px;color:var(--muted);text-decoration:none;cursor:pointer}
+.botnav a.on{color:var(--ink);font-weight:600}
+.botnav a svg{display:block}
+.req{color:#c0392b}
+input::placeholder,textarea::placeholder{color:#c9c2b4;opacity:1}
+.addr-res{font-size:12.5px;border-radius:9px;padding:9px 11px;margin-bottom:12px;line-height:1.6}
+.addr-res.ok{background:#eaf3ec;color:#2a6040;border:1px solid #cfe4d6}
+.addr-res.warn{background:#fbf3e9;color:#9a6a3a;border:1px solid #efdcc4}
+.addr-res.info{background:#eef2fb;color:#3a4a6a;border:1px solid #c5d3ef}
+.addr-cand{display:flex;gap:8px;align-items:flex-start;padding:9px 11px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;font-size:13px;cursor:pointer;background:#fff}
+.addr-cand.on{border-color:var(--primary);background:#f3f2f7}
+.modal-ov{position:fixed;inset:0;background:rgba(30,28,36,.55);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+.modal-ov.show{display:flex}
+.modal-card{background:#fff;border-radius:16px;max-width:420px;width:100%;padding:0;overflow:hidden;position:relative;max-height:90vh;overflow-y:auto}
+.mclose{position:absolute;top:10px;right:12px;background:rgba(255,255,255,.85);border:none;width:34px;height:34px;border-radius:50%;font-size:20px;cursor:pointer;z-index:2}
+.pm-img{width:100%;aspect-ratio:1/1;background:#f3efe8;overflow:hidden}
+.pm-img img{width:100%;height:100%;object-fit:cover}
+.pm-body{padding:18px}
+.pm-cat{font-size:12px;color:var(--gold);margin-bottom:5px}
+.pm-nm{font-size:19px;font-weight:700;font-family:"Shippori Mincho",serif;margin-bottom:6px;line-height:1.4}
+.pm-code{font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.pm-price{font-size:22px;font-weight:700;font-family:"Shippori Mincho",serif;margin:10px 0 16px}
+@media(max-width:560px){
+  .content{padding:16px 15px 190px}
+  .topnav{display:none}
+  .botnav{display:flex}
+  .botbar{bottom:56px}
+  .pcard-img{width:82px}
+  .pnm{font-size:13.5px}.pprice{font-size:15px}
+  .addbtn2{padding:7px 12px;font-size:12px}
+  .lbl-2col{gap:10px}
+  .fuda{aspect-ratio:95/280;width:auto;height:238px;padding:9px 5px 11px}
+  .fuda-hd span{font-size:18px}
+  .fuda-hd{margin-bottom:9px}
+  .grid2{grid-template-columns:1fr 1fr}
+}
+@media(max-width:400px){.pcard-img{width:72px}}
+</style></head>
+<body>
+<div class="app">
+  <div class="urlbar">app.itowa71.com/memorial/2f9c1a8b-7d3e-4c21-9a5f-1b6e0d4f8c92</div>
+  <div class="mhead">
+    <a class="brand" aria-label="ホーム"><svg viewBox="0 -1 25 21" height="20" width="24" fill="#3a3228" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M18.8975 11.7257L18.8936 11.7037C18.7197 10.7565 17.9783 9.14791 17.1163 8.62661C14.5553 7.07764 11.187 9.38872 9.92643 11.6563C9.85995 11.7754 9.81532 11.8796 9.68837 11.9403C9.61246 11.6272 10.208 10.5613 10.391 10.2355C11.8273 7.67943 15.1446 6.00422 17.8765 7.59953C19.0352 8.27622 19.5291 9.22358 20.0437 10.4383C20.9402 10.8705 21.4702 11.0823 22.1717 11.8202C24.4981 14.2672 23.6416 18.5653 20.4523 19.7598C18.6527 20.4338 17.0336 19.5142 15.3457 18.961C14.6292 18.7185 13.8857 18.5657 13.1318 18.5058C12.1927 18.4284 11.1623 18.5156 10.226 18.6432C9.66487 18.7196 9.73526 18.8845 9.01735 18.8568C8.64605 18.8444 8.63008 18.8735 8.36039 18.6476C10.144 17.9469 12.0946 17.4296 14.0269 17.5137C14.7271 17.5477 15.4218 17.6554 16.0996 17.8347C17.8717 18.3097 19.1718 19.0547 20.7974 17.7483C22.7915 16.1457 22.1451 13.0432 19.8771 12.1093C19.5477 11.9736 19.2222 11.8566 18.8975 11.7257Z"/><path d="M4.94315 6.10339C4.90713 6.60803 5.20056 6.74402 5.13361 7.38288C5.07224 7.96866 4.56135 8.20983 4.81454 8.7228C4.49802 9.86791 4.57067 10.4093 4.63536 11.5859C3.34139 12.1298 2.51244 12.3265 1.86599 13.77C1.15289 15.3623 1.68592 17.5089 3.39154 18.1927C3.56063 18.2605 3.87935 18.3307 4.01022 18.3971C4.49808 18.5989 4.80611 18.4021 5.01989 18.7808C5.01562 18.9484 5.01657 18.9816 4.93098 19.1231C5.54847 19.1485 5.69999 18.6541 6.27979 18.7139C6.18898 18.7914 5.89199 18.9851 5.77952 19.0471C4.92273 19.5111 3.91828 19.6186 2.98309 19.3466C-0.581755 18.2725 -0.826754 12.9257 2.10749 11.0157C2.41623 10.8147 2.68224 10.6595 3.00873 10.488C3.06043 10.1617 3.07081 9.74203 3.12642 9.3848C3.35409 7.92303 3.92172 7.1282 4.94315 6.10339Z"/><path d="M7.73246 -0.0309325C8.83134 -0.130338 9.80611 0.673238 9.9209 1.77313C10.0357 2.87302 9.24792 3.86143 8.1523 3.99213C7.42959 4.07833 6.71661 3.76779 6.28631 3.17945C5.85602 2.5911 5.77513 1.81608 6.07461 1.15123C6.37409 0.486323 7.0076 0.0346243 7.73246 -0.0309325Z"/><path d="M17.6115 2.29628C18.6622 2.21525 19.5782 3.0064 19.6536 4.06C19.729 5.11361 18.935 6.02766 17.8835 6.0978C16.8395 6.1674 15.9357 5.37858 15.8609 4.33264C15.7861 3.28671 16.5684 2.37664 17.6115 2.29628Z"/><path d="M4.94315 6.10339C7.43179 4.21646 10.7484 4.46631 12.6711 7.02071L12.8933 7.31863C11.3264 6.23563 10.2468 5.4389 8.09972 5.83896C6.97526 6.0574 5.98262 6.71256 5.33819 7.66164C5.15806 7.92803 4.90392 8.40823 4.81454 8.7228C4.56135 8.20983 5.07224 7.96866 5.13361 7.38288C5.20056 6.74402 4.90713 6.60803 4.94315 6.10339Z"/><path d="M4.01022 18.3971C5.7543 18.289 6.91306 17.6676 8.2189 16.5018C8.35226 16.3827 8.43458 16.1571 8.57945 16.0549L8.59631 16.0428C8.60871 16.0347 8.62112 16.0266 8.63352 16.0185L8.70142 16.0377C8.41665 16.9304 7.12281 18.2423 6.27979 18.7139C5.69999 18.6541 5.54847 19.1485 4.93098 19.1231C5.01657 18.9816 5.01562 18.9484 5.01989 18.7808C4.80611 18.4021 4.49808 18.5989 4.01022 18.3971Z"/><path d="M9.01735 18.8568C8.60789 18.972 8.16542 19.1003 7.73649 19.0226C7.73436 19.0255 8.34615 18.653 8.36039 18.6476C8.63008 18.8735 8.64605 18.8444 9.01735 18.8568Z"/></svg></a>
+    <div class="mhead-center">故人　糸和 花子　様</div>
+    <button class="mhead-acc" aria-label="マイメニュー"><svg viewBox="0 0 24 24" width="22" height="22" fill="#6b5e50" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"/></svg></button>
+  </div>
+  <nav class="topnav"><a class="on">贈る</a></nav>
+  <div class="stepper" id="stepper">
+    <div class="st on" data-s="1"><div class="n">1</div>商品</div>
+    <div class="st" data-s="2"><div class="n">2</div>名札</div>
+    <div class="st" data-s="3"><div class="n">3</div>注文者</div>
+    <div class="st" data-s="4"><div class="n">4</div>お支払い</div>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+<div class="botbar"><div class="botbar-inner" id="botbar"></div></div>
+<nav class="botnav" id="botnav"><a class="on"><svg viewBox="0 0 20 20.038" width="20" height="20" fill="currentColor"><path d="M15.5 10.788V13.038C15.5 13.3213 15.4042 13.5588 15.2125 13.7505C15.0208 13.9421 14.7833 14.038 14.5 14.038C14.2167 14.038 13.9792 13.9421 13.7875 13.7505C13.5958 13.5588 13.5 13.3213 13.5 13.038V11.313L12.375 9.28796C12.2583 9.3713 12.1667 9.47963 12.1 9.61296C12.0333 9.7463 12 9.88796 12 10.038V15.763L14.575 20.038H12.25L10 16.338V10.038C10 9.5213 10.125 9.0463 10.375 8.61296C10.625 8.17963 10.9667 7.8213 11.4 7.53796L10 5.06296C9.66667 4.42963 9.52083 3.7588 9.5625 3.05046C9.60417 2.34213 9.875 1.73796 10.375 1.23796L11.325 0.312963C11.5417 0.0962963 11.7917 -0.00787037 12.075 0.000462963C12.3583 0.0087963 12.5917 0.12963 12.775 0.362963L18.55 7.13796C18.6833 7.30463 18.7917 7.4838 18.875 7.67546C18.9583 7.86713 19.0083 8.0713 19.025 8.28796L20 20.038H18L17.025 8.43796L11.95 2.48796L11.8 2.63796C11.6333 2.80463 11.5375 2.9963 11.5125 3.21296C11.4875 3.42963 11.525 3.63796 11.625 3.83796L15.5 10.788ZM4.5 10.788L8.375 3.83796C8.475 3.63796 8.5125 3.42963 8.4875 3.21296C8.4625 2.9963 8.36667 2.80463 8.2 2.63796L8.05 2.48796L2.975 8.43796L2 20.038H0L0.975 8.28796C0.991667 8.0713 1.04167 7.86713 1.125 7.67546C1.20833 7.4838 1.31667 7.30463 1.45 7.13796L7.225 0.362963C7.40833 0.12963 7.64583 0.0087963 7.9375 0.000462963C8.22917 -0.00787037 8.48333 0.0962963 8.7 0.312963L9.625 1.23796C10.125 1.73796 10.3958 2.34213 10.4375 3.05046C10.4792 3.7588 10.3333 4.42963 10 5.06296L8.6 7.53796C9.03333 7.8213 9.375 8.17963 9.625 8.61296C9.875 9.0463 10 9.5213 10 10.038V16.338L7.75 20.038H5.425L8 15.763V10.038C8 9.88796 7.96667 9.7463 7.9 9.61296C7.83333 9.47963 7.74167 9.3713 7.625 9.28796L6.5 11.313V13.038C6.5 13.3213 6.40417 13.5588 6.2125 13.7505C6.02083 13.9421 5.78333 14.038 5.5 14.038C5.21667 14.038 4.97917 13.9421 4.7875 13.7505C4.59583 13.5588 4.5 13.3213 4.5 13.038V10.788Z"/></svg><span>贈る</span></a></nav>
+<div class="modal-ov" id="prodModal"><div class="modal-card">
+  <button class="mclose" onclick="closeProdModal()">×</button>
+  <div class="pm-img"><img id="pm-img" src="" alt=""></div>
+  <div class="pm-body"><div class="pm-cat" id="pm-cat"></div><div class="pm-nm" id="pm-nm"></div><div class="pm-code" id="pm-code"></div><div class="pm-price" id="pm-price"></div><button class="btn btn-p" style="width:100%" onclick="addFromModal()">＋ カートに追加</button></div>
+</div></div>
+<div class="modal-ov" id="crossModal"><div class="modal-card" style="max-width:380px"><div class="pm-body" style="padding:22px 20px"><div style="font-family:'Shippori Mincho',serif;font-size:18px;margin-bottom:10px">一緒にいかがですか</div><div id="cross-msg" class="hint" style="margin-bottom:20px;font-size:13.5px"></div><button class="btn btn-p" style="width:100%;margin-bottom:10px" onclick="crossGoProducts()">商品選択に進む</button><button class="btn btn-g" style="width:100%" onclick="crossGoOrderer()">注文者情報入力へ進む</button></div></div></div>
+<script>
+const IMG='data:image/jpeg;base64,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';
+const yen=n=>'¥'+n.toLocaleString();
+const FUNERAL={fam:'糸和 花子',wake:'7/28（月）18:00',funeral:'7/29（火）10:00',hall:'いとわ会館 名古屋',uuid:'2f9c1a8b-7d3e-4c21-9a5f-1b6e0d4f8c92'};
+const CATS=[{id:'all',label:'すべて'},{id:'kuge',label:'供花供物'},{id:'message',label:'弔文'},{id:'telegram',label:'弔電'},{id:'kouden',label:'香典'}];
+const PRODUCTS=[
+  {code:'F001',cat:'kuge',catL:'供花',name:'供花（白基調）1基',price:16500,pop:142},
+  {code:'F002',cat:'kuge',catL:'供花',name:'供花（追悼・洋花）1基',price:22000,pop:88},
+  {code:'F003',cat:'kuge',catL:'供花',name:'供花（対）2基',price:33000,pop:24},
+  {code:'K001',cat:'kuge',catL:'供物',name:'供物 果物籠',price:11000,pop:61},
+  {code:'K002',cat:'kuge',catL:'供物',name:'供物 缶詰篭',price:11000,pop:19},
+  {code:'T001',cat:'telegram',catL:'弔電',name:'弔電 花付き（プリザーブド）',price:5500,pop:33},
+  {code:'T002',cat:'telegram',catL:'弔電',name:'弔電 スタンダード',price:2200,pop:47},
+  {code:'KD01',cat:'kouden',catL:'香典',name:'御香典（カード決済）',price:10000,pop:15},
+];
+const RETURN_GIFTS=[
+  {id:'RG1',name:'お茶詰合せ 3000円コース',price:3000,desc:'銘茶の詰め合わせ。'},
+  {id:'RG2',name:'お茶詰合せ 5000円コース',price:5000,desc:'上級銘茶の詰め合わせ。'},
+  {id:'RG3',name:'カタログギフト 5000円コース',price:5000,desc:'お相手が選べるカタログギフト。'},
+  {id:'RG4',name:'カタログギフト 10000円コース',price:10000,desc:'幅広い商品から選べるカタログギフト。'},
+];
+const POP_AVAILABLE=true;
+// 住所マスター（メモリード／zebra連携）モック。実装では GET /memolead-address-master/search?zipCode=… に置換。
+// 各候補の addressId が zebra に渡す独自コード（郵便番号ではない＝MemoleadAddressSelection）。
+const MOCK_ADDRESS_MASTER={
+  '4660064':[
+    {addressId:'a1',pref:'愛知県',addr1:'名古屋市昭和区鶴舞1丁目'},
+    {addressId:'a2',pref:'愛知県',addr1:'名古屋市昭和区鶴舞2丁目'},
+    {addressId:'a3',pref:'愛知県',addr1:'名古屋市昭和区鶴舞3丁目'},
+    {addressId:'a4',pref:'愛知県',addr1:'名古屋市昭和区鶴舞4丁目'},
+  ],
+  '1030028':[{addressId:'y1',pref:'東京都',addr1:'中央区八重洲1丁目'}],
+  '1040028':[{addressId:'y2',pref:'東京都',addr1:'中央区八重洲2丁目'}],
+  '5300001':[
+    {addressId:'c1',pref:'大阪府',addr1:'大阪市北区梅田1丁目'},
+    {addressId:'c2',pref:'大阪府',addr1:'大阪市北区梅田2丁目'},
+    {addressId:'c3',pref:'大阪府',addr1:'大阪市北区梅田3丁目'},
+  ],
+  '1000001':[{addressId:'d1',pref:'東京都',addr1:'千代田区千代田1丁目'}],
+};
+// 住所→郵便番号 逆引き検索（郵便番号単位）モック。実装では佐川の住所→郵便番号APIを参照する。
+const MOCK_ADDR_SEARCH=[
+  {zip:'1030028',pref:'東京都',town:'中央区八重洲1丁目',key:'やえす'},
+  {zip:'1040028',pref:'東京都',town:'中央区八重洲2丁目',key:'やえす'},
+  {zip:'4660064',pref:'愛知県',town:'名古屋市昭和区鶴舞',key:'つるまい'},
+  {zip:'5300001',pref:'大阪府',town:'大阪市北区梅田',key:'うめだ'},
+]; // 葬儀社の直近3ヶ月の注文集計(電話/FAX含む)が取得できる場合のみtrue。falseなら登録順にフォールバック
+const QUICK=['子供一同','孫一同','親族一同','兄弟一同','友人一同','有志一同'];
+const CORP_TYPES=['株式会社','有限会社','合同会社','（記載なし）'];
+const CORP_TYPES_QUICK=['株式会社','有限会社','合同会社','一般社団法人','一般財団法人','公益社団法人','医療法人','社会福祉法人','宗教法人','NPO法人','協同組合'];
+const CORP_PATTERNS=[{t:'株式会社',p:'前',chip:'株式会社（前）'},{t:'株式会社',p:'後',chip:'株式会社（後）'},{t:'有限会社',p:'前',chip:'有限会社（前）'},{t:'有限会社',p:'後',chip:'有限会社（後）'},{t:'合同会社',p:'前',chip:'合同会社（前）'},{t:'一般社団法人',p:'前',chip:'一般社団法人'},{t:'一般財団法人',p:'前',chip:'一般財団法人'},{t:'公益社団法人',p:'前',chip:'公益社団法人'},{t:'医療法人',p:'前',chip:'医療法人'},{t:'社会福祉法人',p:'前',chip:'社会福祉法人'},{t:'宗教法人',p:'前',chip:'宗教法人'},{t:'NPO法人',p:'前',chip:'NPO法人'},{t:'協同組合',p:'前',chip:'協同組合'},{t:'',p:'前',chip:'記載なし'}];
+const TITLE_QUICK=['代表取締役社長','代表取締役','会長','社長','取締役','代表'];
+const LBLBG=['#eef5ff','#eefaf1','#fffaec','#fdf0f6','#f4f1fb'];
+const LBLBD=['#4a6fa5','#4a7c59','#b0925a','#b56a8f','#7a6fa5'];
+const MAX_NAMES=8;
+
+let step=1, cat='all', modalCode=null;
+let cart=[], uidC=0;
+let orderer={kind:'individual',company:'',companyKana:'',dept:'',deptKana:'',sei:'',mei:'',kanaSei:'',kanaMei:'',phone:'',email:'',zip:'',pref:'',addr1:'',addr2:'',building:'',addrMatchType:null,addrCandidates:[],addrSelectedId:'',addrSearchedZip:'',addrSearchOpen:false,addrSearchQuery:'',addrSearchResults:null};
+let payMethod='card',billingName='',sortOrder='default',returnGift=null,crossSellShown=false;
+function emptyLabel(){return {kind:orderer.kind==='corporate'?'corporate':'individual',withRelation:false,names:[{relation:'',name:'',isCouple:false,kana:''}],corp:{type:'株式会社',pos:'前',company:'',title:'代表取締役',name:''},corpTouched:false,note:'',message:''};}
+function cartTotal(){return cart.reduce((s,c)=>s+c.price,0);}
+
+function esc(x){return (x==null?'':String(x)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function splitSurname(nm){const g=Array.from(nm);const idx=g.findIndex(ch=>ch===' '||ch==='　');if(idx>0)return [idx,g.slice(0,idx).join(''),g.slice(idx+1).join('')];return [0,'',nm];}
+function fudaGlyphs(str,fp){const DASH=['ー','ｰ','－','‐','‑','‒','–','—','―','−','〜','～','~','-'];return Array.from(str).map(ch=>{if(ch===' '||ch==='　')return `<span style="display:block;height:${Math.round(fp*0.5)}px"></span>`;const rot=DASH.includes(ch)?'transform:rotate(90deg);':'';return `<span style="display:block;font-size:${fp}px;line-height:1.12;${rot}">${esc(ch)}</span>`;}).join('');}
+function fudaSpacer(px){return px>0?`<span style="display:block;height:${Math.round(px)}px"></span>`:'';}
+function fudaHtml(l){
+  const bodyH=180,innerW=61,LH=1.15;
+  const wrap=rows=>`<div class="fuda"><div class="fuda-hd"><span>御</span><span>供</span></div><div class="fuda-body">${rows}</div></div>`;
+  const empty=wrap('<div class="fuda-row"><div class="fuda-col" style="color:#bbb;font-size:12px">お名前未入力</div></div>');
+  const clen=x=>Array.from(x).length;
+  let specs=[];
+  if(l.kind==='individual'){
+    const es=l.names.filter(n=>n.name.trim()).map(n=>{const nm=n.name.trim();const r=n.isCouple?[0,'',nm]:splitSurname(nm);return {relation:l.withRelation?(n.relation||'').trim():'',surnameLen:r[0],surname:r[1],given:r[2]};});
+    const ws=es.filter(e=>e.surnameLen>0);const maxLen=ws.length?Math.max(...ws.map(e=>e.surnameLen)):0;
+    specs=es.map(e=>{let head=e.surname,tail=e.given,gapU=0;if(e.surnameLen>0)gapU=0.5+(maxLen-e.surnameLen);else if(maxLen>0){head='';gapU=maxLen+0.5;}const relU=l.withRelation?(e.relation?clen(e.relation)*0.44+0.3:0.44+0.3):0;return {t:'name',relation:e.relation,head,gapU,tail,units:relU+clen(head)+gapU+clen(tail)};});
+  }else{
+    const c=l.corp;const title=(c.title||'').trim();const org=c.company.trim();const name=c.name.trim();
+    if(org)specs.push({t:'org',text:org,units:clen(org)*0.72});
+    if(name||title)specs.push({t:'cname',title,name,units:(title?clen(title)*0.44+0.3:0)+clen(name)});
+  }
+  if(!specs.length)return empty;
+  let rows;
+  if(l.kind==='individual'){const N=specs.length;if(N<=4)rows=[specs];else{const top=Math.ceil(N/2);rows=[specs.slice(0,top),specs.slice(top)];}}else rows=[specs];
+  const numRows=rows.length,maxColUnits=Math.max(1,...specs.map(s=>s.units)),maxCols=Math.max(...rows.map(r=>r.length));
+  let NF=Math.round(Math.min(bodyH*0.9/(numRows*maxColUnits*LH),innerW/(maxCols*1.35)));NF=Math.max(6,Math.min(36,NF));
+  const OF=Math.round(NF*0.72),TF=Math.round(NF*0.44);
+  const rc=s=>{
+    if(s.t==='org')return `<div class="fuda-col">${fudaGlyphs(s.text,OF)}</div>`;
+    if(s.t==='cname'){let inn='';if(s.title)inn+=fudaGlyphs(s.title,TF)+fudaSpacer(NF*0.3);inn+=fudaGlyphs(s.name,NF);return `<div class="fuda-col">${inn}</div>`;}
+    let inn='';
+    if(l.kind==='individual'&&l.withRelation)inn+=(s.relation?fudaGlyphs(s.relation,TF)+fudaSpacer(NF*0.3):fudaSpacer(Math.round(TF*LH+NF*0.3)));
+    if(s.head)inn+=fudaGlyphs(s.head,NF);
+    if(s.gapU>0)inn+=fudaSpacer(s.gapU*NF*LH);
+    inn+=fudaGlyphs(s.tail,NF);
+    return `<div class="fuda-col">${inn}</div>`;
+  };
+  return wrap(rows.map(r=>`<div class="fuda-row">${r.map(rc).join('')}</div>`).join(''));
+}
+function toKatakana(x){return (x||'').replace(/[ぁ-ん]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));}
+const NAME_KANA={'佐藤':'サトウ','鈴木':'スズキ','高橋':'タカハシ','髙橋':'タカハシ','田中':'タナカ','伊藤':'イトウ','渡辺':'ワタナベ','渡邊':'ワタナベ','渡邉':'ワタナベ','山本':'ヤマモト','中村':'ナカムラ','小林':'コバヤシ','加藤':'カトウ','吉田':'ヨシダ','山田':'ヤマダ','佐々木':'ササキ','山口':'ヤマグチ','松本':'マツモト','井上':'イノウエ','木村':'キムラ','林':'ハヤシ','斎藤':'サイトウ','斉藤':'サイトウ','清水':'シミズ','山崎':'ヤマザキ','森':'モリ','池田':'イケダ','橋本':'ハシモト','阿部':'アベ','石川':'イシカワ','前田':'マエダ','藤田':'フジタ','後藤':'ゴトウ','岡田':'オカダ','長谷川':'ハセガワ','村上':'ムラカミ','近藤':'コンドウ','石井':'イシイ','坂本':'サカモト','坂元':'サカモト','遠藤':'エンドウ','藤井':'フジイ','青木':'アオキ','福田':'フクダ','三浦':'ミウラ','西村':'ニシムラ','藤原':'フジワラ','太田':'オオタ','松田':'マツダ','原田':'ハラダ','岡本':'オカモト','中島':'ナカジマ','中野':'ナカノ','小川':'オガワ','糸和':'イトワ','太郎':'タロウ','次郎':'ジロウ','三郎':'サブロウ','一郎':'イチロウ','花子':'ハナコ','幸子':'サチコ','和子':'カズコ','洋子':'ヨウコ','美咲':'ミサキ','翔太':'ショウタ','健一':'ケンイチ','大輔':'ダイスケ','拓也':'タクヤ','浩':'ヒロシ','充':'ミツル','誠':'マコト','明':'アキラ','恵':'メグミ','愛':'アイ','薫':'カオル','株式会社':'カブシキガイシャ','有限会社':'ユウゲンガイシャ','合同会社':'ゴウドウガイシャ','一般社団法人':'イッパンシャダンホウジン','医療法人':'イリョウホウジン','宗教法人':'シュウキョウホウジン'};
+function predictKana(kanji){if(!kanji)return '';const v=kanji.trim();if(NAME_KANA[v])return NAME_KANA[v];return '';}
+function composeLabel(l){
+  if(l.kind==='individual'){return l.names.filter(n=>n.name.trim()).map(n=>(l.withRelation&&n.relation?n.relation+' ':'')+n.name.trim()).join(' ／ ');}
+  const c=l.corp;const type=c.type==='（記載なし）'?'':c.type;return [type+c.company.trim(),(c.title||'').trim(),c.name.trim()].filter(Boolean).join(' ');
+}
+const MSG_LABEL={telegram:'弔電本文',kouden:'メッセージ',message:'弔文（本文）'};
+const MSG_PH={telegram:'弔電の本文を入力してください',kouden:'メッセージを入力してください',message:'弔文の本文を入力してください'};
+function needsFuda(cat){return cat==='kuge';}
+function needsMessage(cat){return cat==='telegram'||cat==='kouden'||cat==='message';}
+function messageRequired(cat){return cat==='telegram'||cat==='message';}
+function labelFilledOne(l,cat){
+  if(!cat||cat==='kuge')return l.kind==='individual'?l.names.some(n=>n.name.trim()):(!!l.corp.company.trim()&&!!l.corpTouched);
+  const nameOk=(l.names[0].name||'').trim();const msgOk=!messageRequired(cat)||(l.message||'').trim();
+  return !!(nameOk&&msgOk);
+}
+
+const C=()=>document.getElementById('content');
+function setStep(n){step=n;render();window.scrollTo(0,0);}
+function renderStepper(){document.querySelectorAll('#stepper .st').forEach(el=>{const s=+el.dataset.s;el.classList.toggle('on',s===step);el.classList.toggle('done',s<step);});}
+function render(){renderStepper();if(step===1)renderProducts();else if(step===2)renderLabel();else if(step===2.5)renderReturnGift();else if(step===3)renderOrderer();else if(step===4)renderPayment();else if(step===5)renderComplete();renderBar();}
+
+function obiCard(){return `<div class="obi"><div class="ph"><i class="fas fa-seedling"></i></div><div><div class="nm mser">${FUNERAL.fam} 様</div><div class="meta">通夜 ${FUNERAL.wake}<br>葬儀 ${FUNERAL.funeral}<br>${FUNERAL.hall}</div></div></div>`;}
+function catsWithProducts(){return CATS.filter(c=>c.id==='all'||PRODUCTS.some(p=>p.cat===c.id));}
+
+function renderProducts(){
+  let list=cat==='all'?[...PRODUCTS]:PRODUCTS.filter(p=>p.cat===cat);
+  if(sortOrder==='priceDesc')list=[...list].sort((a,b)=>b.price-a.price);
+  else if(sortOrder==='priceAsc')list=[...list].sort((a,b)=>a.price-b.price);
+  else if(sortOrder==='popular'&&POP_AVAILABLE)list=[...list].sort((a,b)=>(b.pop||0)-(a.pop||0));
+  // それ以外（登録順 / データ取得不可の選ばれている順）は登録順のまま
+  let html=`<div class="sec-lead mser">お供えを選ぶ（複数可）</div>
+    <div class="chips">${catsWithProducts().map(c=>`<span class="chip ${cat===c.id?'on':''}" onclick="setCat('${c.id}')">${c.label}</span>`).join('')}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px"><div class="deadline" style="margin-bottom:0">締切：通夜まで 7/28 15:00 ／ 葬儀まで 7/29 07:00</div>
+      <select onchange="setSort(this.value)" style="border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:13px;background:#fff;font-family:inherit;flex-shrink:0"><option value="default" ${sortOrder==='default'?'selected':''}>登録順</option><option value="priceDesc" ${sortOrder==='priceDesc'?'selected':''}>高い順</option><option value="popular" ${sortOrder==='popular'?'selected':''}>選ばれている順</option><option value="priceAsc" ${sortOrder==='priceAsc'?'selected':''}>安い順</option></select></div>
+    ${sortOrder==='popular'?(POP_AVAILABLE?'<div class="hint" style="margin:-4px 0 10px"><i class="fas fa-chart-line" style="color:var(--gold)"></i> 葬儀社の直近3ヶ月の注文実績（電話・FAX注文含む）で選ばれている順に表示しています。</div>':'<div class="hint" style="margin:-4px 0 10px"><i class="fas fa-circle-info" style="color:var(--gold)"></i> 選ばれているデータを取得できないため、登録順で表示しています。</div>'):''}
+    <div class="prod-list">`;
+  html+=list.map(p=>`<div class="pcard" onclick="openProdModal('${p.code}')"><div class="pcard-img"><img src="${IMG}" alt=""></div><div class="pcard-body"><div class="pcat">${p.catL}</div><div class="pnm">${p.name}</div><div class="pcode">商品コード：${p.code}</div><div class="pcard-foot"><span class="pprice">${yen(p.price)}</span><button class="addbtn2" onclick="event.stopPropagation();addToCart('${p.code}')">＋ 追加</button></div></div></div>`).join('');
+  html+=`</div>`;
+  if(cart.length){
+    html+=`<div class="card" style="margin-top:16px"><div style="font-weight:600;margin-bottom:8px"><i class="fas fa-basket-shopping" style="color:var(--gold)"></i> 選択中のお供え（${cart.length}件）</div>`;
+    html+=cart.map(c=>`<div class="sumrow"><span>${c.name}</span><span>${yen(c.price)} <span onclick="removeCart(${c.uid})" style="color:#c0392b;cursor:pointer;margin-left:6px;font-size:15px">×</span></span></div>`).join('');
+    html+=`<div class="sumrow total"><span>小計</span><span>${yen(cartTotal())}</span></div><div class="hint" style="margin-top:6px">「次へ」で商品ごとにお名札を入力します。</div></div>`;
+  }
+  C().innerHTML=html;
+}
+function setCat(c){cat=c;render();}
+function setSort(v){sortOrder=v;renderProducts();}
+function addToCart(code){const p=PRODUCTS.find(x=>x.code===code);const l=emptyLabel();if(p.cat==='kouden')l.message='謹んでお悔やみ申し上げます。';cart.push({uid:++uidC,code:p.code,cat:p.cat,catL:p.catL,name:p.name,price:p.price,label:l});if(step===1)renderProducts();renderBar();}
+function removeCart(uid){cart=cart.filter(c=>c.uid!==uid);renderProducts();renderBar();}
+function openProdModal(code){const p=PRODUCTS.find(x=>x.code===code);modalCode=code;document.getElementById('pm-img').src=IMG;document.getElementById('pm-cat').textContent=p.catL;document.getElementById('pm-nm').textContent=p.name;document.getElementById('pm-code').textContent='商品コード：'+p.code;document.getElementById('pm-price').textContent=yen(p.price);document.getElementById('prodModal').classList.add('show');}
+function closeProdModal(){document.getElementById('prodModal').classList.remove('show');}
+function addFromModal(){if(modalCode)addToCart(modalCode);closeProdModal();}
+
+function labelForm(c,ci){
+  const l=c.label;
+  let f=`<div class="toggle" style="margin-bottom:12px"><button class="${l.kind==='individual'?'on':''}" onclick="setKind(${ci},'individual')">個人・連名</button><button class="${l.kind==='corporate'?'on':''}" onclick="setKind(${ci},'corporate')">会社・団体</button></div>`;
+  if(l.kind==='individual'){
+    f+=`<label style="font-size:13px;display:flex;gap:7px;align-items:center;margin-bottom:8px"><input type="checkbox" ${l.withRelation?'checked':''} onchange="setRel(${ci},this.checked)"> 続柄を付ける（長男 など）</label>`;
+    f+=`<div class="hint" style="margin-bottom:11px">ご夫婦・お子様を連名にする場合は、1人目に姓名（山田 太郎）、2人目以降を「名のみ（姓を省略）」にすると、姓をまとめて先頭を揃えて表示します。</div>`;
+    l.names.forEach((n,i)=>{
+      f+=`<div class="namerow">`;
+      if(i>0)f+=`<label style="font-size:12px;display:flex;gap:6px;align-items:center;margin-bottom:7px"><input type="checkbox" ${n.isCouple?'checked':''} onchange="setCouple(${ci},${i},this.checked)"> 名のみ（姓を省略：夫婦・お子様など）</label>`;
+      if(l.withRelation)f+=`<div class="fld" style="margin-bottom:8px"><label>続柄</label><input value="${esc(n.relation)}" placeholder="長男" oninput="setNameField(${ci},${i},'relation',this.value)"></div>`;
+      f+=`<div class="fld" style="margin-bottom:0"><label>${n.isCouple?'名（'+(i+1)+'人目）':(i===0?'お名前':'お名前（'+(i+1)+'人目）')}<span style="color:#9a8f7e;font-weight:400">（15文字以内）</span></label><input id="nm-${ci}-${i}" maxlength="15" value="${esc(n.name)}" placeholder="${n.isCouple?'花子':'山田 太郎'}" oninput="setNameField(${ci},${i},'name',this.value)"></div></div>`;
+    });
+    f+=`<div style="display:flex;gap:8px;margin-bottom:6px">`;
+    if(l.names.length>1)f+=`<button class="mini" onclick="rmName(${ci})">－ 削除</button>`;
+    if(l.names.length<MAX_NAMES)f+=`<button class="addbtn" style="flex:1" onclick="addName(${ci})">＋ 改行追加（連名）</button>`;
+    f+=`</div>`;
+  }else{
+    const c2=l.corp;
+    f+=`<div class="hint" style="margin-bottom:5px">法人・団体の種別（タップで法人・団体名に挿入。前株・後株はご自身で並べ替え）</div><div class="qchips" style="margin-bottom:11px">${CORP_TYPES_QUICK.map(t=>`<span class="qchip${c2.type===t?' on':''}" onclick="setCorpType(${ci},'${t}')">${t}</span>`).join('')}</div>`;
+    f+=`<div class="fld"><label>法人・団体名</label><input id="co-${ci}" maxlength="30" value="${esc(c2.company)}" placeholder="〇〇" oninput="setCorp(${ci},'company',this.value)"></div>`;
+    f+=`<div class="hint" style="margin-bottom:5px">よく使う肩書き（タップで挿入）</div><div class="qchips">${TITLE_QUICK.map(t=>`<span class="qchip${c2.title===t?' on':''}" onclick="setCorpTitle(${ci},'${t}')">${t}</span>`).join('')}</div>`;
+    f+=`<div class="fld"><label>役職・肩書き（任意）</label><input id="title-${ci}" maxlength="15" value="${esc(c2.title)}" placeholder="代表取締役" oninput="setCorp(${ci},'title',this.value)"></div>`;
+    f+=`<div class="fld"><label>氏名（任意）</label><input maxlength="15" value="${esc(c2.name)}" placeholder="山田 太郎" oninput="setCorp(${ci},'name',this.value)"></div>`;
+  }
+  f+=`<div class="fld" style="margin-top:12px;margin-bottom:0"><label><i class="far fa-sticky-note" style="color:var(--gold)"></i> 備考・メモ（旧漢字・外字・特記事項など）</label><textarea rows="2" maxlength="60" placeholder="例）「渡辺」の辺は旧字体（邊）でお願いします" style="width:100%;border:1px solid #d6d0c4;border-radius:9px;padding:11px 12px;font-size:14px;font-family:inherit;resize:vertical;line-height:1.6" oninput="setNote(${ci},this.value)">${esc(l.note)}</textarea><div class="hint" style="margin-top:5px;display:flex;justify-content:space-between;gap:8px"><span>旧字体・環境依存文字は名札制作者が対応します。</span><span style="white-space:nowrap"><span id="notec-${ci}">${Array.from(l.note).length}</span>/60</span></div></div>`;
+  return f;
+}
+function renderLabel(){
+  if(!cart.length){C().innerHTML='<div class="hint">先に商品を選択してください。</div>';return;}
+  let html=`<div class="sec-lead mser">お名前・お名札の入力（商品ごと）</div>
+    <div class="card" style="background:var(--soft)"><div style="font-size:13px;font-weight:600;margin-bottom:8px">ご注文者区分</div>
+      <div class="toggle"><button class="${orderer.kind==='individual'?'on':''}" onclick="setOKind('individual')">個人</button><button class="${orderer.kind==='corporate'?'on':''}" onclick="setOKind('corporate')">法人・団体</button></div>
+      <div class="hint" style="margin-top:7px">区分に合わせて、供花・供物のお名札の初期タブ（個人＝「個人・連名」／法人＝「会社・団体」）が切り替わります。</div></div>`;
+  cart.forEach((c,ci)=>{
+    const ok=labelFilledOne(c.label,c.cat);
+    html+=`<div class="card" style="border-left:4px solid ${LBLBD[ci%LBLBD.length]};background:${LBLBG[ci%LBLBG.length]}">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px"><img src="${IMG}" style="width:36px;height:36px;border-radius:6px;object-fit:cover"><div style="min-width:0"><div style="font-size:14px;font-weight:600;line-height:1.3">${c.name}</div><div style="font-size:12px;color:var(--muted)">${c.catL}／${yen(c.price)}</div></div><span class="badge" id="badge-${ci}" style="color:${ok?'#15803d':'#b91c1c'};background:${ok?'#dcfce7':'#fee2e2'}">${ok?'入力済':'未入力'}</span></div>`;
+    if(needsFuda(c.cat)){
+      html+=`<div class="lbl-2col"><div class="lbl-fuda-col"><div class="fuda-wrap-s"><div style="font-size:10px;color:var(--muted);text-align:center;margin-bottom:4px">プレビュー</div><div id="fuda-${ci}">${fudaHtml(c.label)}</div></div></div><div class="lbl-form">${labelForm(c,ci)}</div></div>
+      <div class="fuda-note" style="width:auto;max-width:100%;margin-top:12px"><i class="fas fa-circle-info" style="color:var(--gold)"></i> こちらはお名前の並びを<b>イメージしていただくためのサンプル表示</b>です。実際のお名札は、文字の配置・書体・バランスを<b>名札制作者が丁寧に調整して作成</b>いたしますので、表示と異なる場合がございます。</div>`;
+    }else{
+      html+=simpleLabelForm(c,ci);
+    }
+    html+=`</div>`;
+  });
+  C().innerHTML=html;
+  cart.forEach((c,ci)=>{if(!needsFuda(c.cat)||c.label.kind!=='individual')return;c.label.names.forEach((n,i)=>{const el=document.getElementById('nm-'+ci+'-'+i);if(!el)return;el.addEventListener('input',()=>{if(!el.value){n.kana='';return;}const hit=predictKana(el.value);if(hit)n.kana=hit;});});});
+}
+function simpleLabelForm(c,ci){
+  const l=c.label,cat=c.cat;
+  const catNote=cat==='telegram'?'弔電の台紙にお名前と本文を印字します（縦書きお名札のレイアウトはありません）。':(cat==='kouden'?'香典のお名前・メッセージをご入力ください。':'弔文のお名前・本文をご入力ください。');
+  let f=`<div class="hint" style="margin-bottom:10px">${catNote}</div>`;
+  f+=`<div class="fld"><label>お名前 <span class="req">*</span></label><input value="${esc(l.names[0].name)}" placeholder="山田 太郎 ／ 〇〇一同" oninput="setSimpleName(${ci},this.value)"></div>`;
+  if(needsMessage(cat)){
+    const req=messageRequired(cat);
+    f+=`<div class="fld" style="margin-bottom:${cat==='telegram'?'6px':'0'}"><label>${MSG_LABEL[cat]||'メッセージ'}${req?' <span class="req">*</span>':''}</label><textarea rows="4" placeholder="${MSG_PH[cat]||''}" style="width:100%;border:1px solid #d6d0c4;border-radius:9px;padding:11px 12px;font-size:14px;font-family:inherit;resize:vertical;line-height:1.7" oninput="setMessage(${ci},this.value)">${esc(l.message||'')}</textarea></div>`;
+    if(cat==='telegram')f+=`<div class="hint">佐川弔電は改行できません。定型文の選択・編集は実装時に対応します。</div>`;
+  }
+  return f;
+}
+function setSimpleName(ci,v){cart[ci].label.names[0].name=v;updBadge(ci);renderBar();}
+function setMessage(ci,v){if(cart[ci].cat==='telegram')v=v.replace(/[\r\n]/g,'');cart[ci].label.message=v;updBadge(ci);renderBar();}
+function refreshFuda(ci){const el=document.getElementById('fuda-'+ci);if(el)el.innerHTML=fudaHtml(cart[ci].label);}
+function updBadge(ci){const el=document.getElementById('badge-'+ci);if(!el)return;const ok=labelFilledOne(cart[ci].label,cart[ci].cat);el.textContent=ok?'入力済':'未入力';el.style.color=ok?'#15803d':'#b91c1c';el.style.background=ok?'#dcfce7':'#fee2e2';}
+function setOKind(k){orderer.kind=k;cart.forEach(c=>{c.label.kind=(k==='corporate'?'corporate':'individual');});render();}
+function setKind(ci,k){cart[ci].label.kind=k;renderLabel();renderBar();}
+function setRel(ci,v){cart[ci].label.withRelation=v;renderLabel();}
+function setCouple(ci,i,v){cart[ci].label.names[i].isCouple=v;renderLabel();}
+function setQuick(ci,i,q){cart[ci].label.names[i].name=q;renderLabel();renderBar();}
+function setNameField(ci,i,k,v){cart[ci].label.names[i][k]=v;refreshFuda(ci);updBadge(ci);renderBar();}
+function addName(ci){if(cart[ci].label.names.length<MAX_NAMES){cart[ci].label.names.push({relation:'',name:'',isCouple:false,kana:''});renderLabel();}}
+function rmName(ci){if(cart[ci].label.names.length>1){cart[ci].label.names.pop();renderLabel();renderBar();}}
+function setNote(ci,v){cart[ci].label.note=v;const el=document.getElementById('notec-'+ci);if(el)el.textContent=Array.from(v).length;}
+function insertAtCursor(el,txt){const st=(el.selectionStart==null?el.value.length:el.selectionStart),en=(el.selectionEnd==null?el.value.length:el.selectionEnd);el.value=el.value.slice(0,st)+txt+el.value.slice(en);el.focus();try{el.setSelectionRange(st+txt.length,st+txt.length);}catch(_){}}
+function setCorpType(ci,t){
+  const L=cart[ci].label;const el=document.getElementById('co-'+ci);
+  let val=el?el.value:(L.corp.company||'');const old=L.corp.type||'';let pos=null;
+  if(old){const idx=val.indexOf(old);if(idx>=0){pos=idx;val=val.slice(0,idx)+val.slice(idx+old.length);}}
+  if(t===old){L.corp.type='';}
+  else{const at=(pos!=null)?pos:(el&&el.selectionStart!=null?el.selectionStart:val.length);val=val.slice(0,at)+t+val.slice(at);L.corp.type=t;}
+  L.corp.company=val.slice(0,30);L.corpTouched=true;renderLabel();
+}
+function setCorpTitle(ci,t){const L=cart[ci].label;L.corp.title=(L.corp.title===t)?'':t;L.corpTouched=true;renderLabel();}
+function setCorp(ci,k,v){
+  const L=cart[ci].label;
+  if(k==='typepattern'){const a=v.split('|');L.corp.type=a[0];L.corp.pos=a[1]||'前';L.corpTouched=true;refreshFuda(ci);updBadge(ci);renderLabel();return;}
+  L.corp[k]=v;L.corpTouched=true;
+  if(k==='company'){for(let j=ci+1;j<cart.length;j++){if(cart[j].label.kind==='corporate'){cart[j].label.corp.company=v;const el=document.getElementById('co-'+j);if(el)el.value=v;refreshFuda(j);updBadge(j);}}}
+  refreshFuda(ci);updBadge(ci);renderBar();
+}
+
+function orderInput(k,v){orderer[k]=v;renderBar();}
+function setOKind3(k){orderer.kind=k;cart.forEach(c=>{c.label.kind=(k==='corporate'?'corporate':'individual');});renderOrderer();renderBar();}
+function searchAddr(z){orderer.addrSearchedZip=z;const res=MOCK_ADDRESS_MASTER[z];if(!res||!res.length){orderer.addrCandidates=[];orderer.addrSelectedId='';orderer.pref='';orderer.addr1='';return;}orderer.addrCandidates=res;if(res.length===1){selectAddrObj(res[0]);}else{orderer.addrSelectedId='';orderer.pref='';orderer.addr1='';}}
+function selectAddrObj(a){orderer.addrSelectedId=a.addressId;orderer.pref=a.pref;orderer.addr1=a.addr1;}
+function selectAddr(id){if(!id){orderer.addrSelectedId='';orderer.pref='';orderer.addr1='';renderOrderer();renderBar();return;}const a=orderer.addrCandidates.find(x=>x.addressId===id);if(a){selectAddrObj(a);renderOrderer();renderBar();}}
+function onZipInput(v){orderer.zip=v;const z=v.replace(/[^0-9]/g,'');if(/^\d{7}$/.test(z)){if(orderer.addrSearchedZip!==z){searchAddr(z);renderOrderer();return;}}else if(orderer.addrSearchedZip){orderer.addrSearchedZip='';orderer.addrCandidates=[];orderer.addrSelectedId='';orderer.pref='';orderer.addr1='';renderOrderer();return;}renderBar();}
+function toggleAddrSearch(){orderer.addrSearchOpen=!orderer.addrSearchOpen;renderOrderer();}
+function setAddrQuery(v){orderer.addrSearchQuery=v;}
+function runAddrSearch(){const q=(orderer.addrSearchQuery||'').replace(/[\s　]/g,'');orderer.addrSearchResults=q.length>=2?MOCK_ADDR_SEARCH.filter(r=>(r.pref+r.town+(r.key||'')).replace(/[\s　]/g,'').includes(q)):[];renderOrderer();}
+function pickAddrSearch(i){const r=orderer.addrSearchResults[i];if(!r)return;orderer.zip=r.zip;searchAddr(r.zip);orderer.addrSearchOpen=false;orderer.addrSearchResults=null;renderOrderer();renderBar();}
+function addressSection(){
+  const o=orderer;const fmtZip=z=>z&&z.length===7?z.slice(0,3)+'-'+z.slice(3):z;
+  let h=`<div class="fld" style="margin-bottom:6px"><label>郵便番号 <span class="req">*</span></label><input id="o-zip" value="${esc(o.zip)}" placeholder="4660064" inputmode="numeric" oninput="onZipInput(this.value)"></div>
+    <div style="margin:0 0 14px"><a onclick="toggleAddrSearch()" style="font-size:12.5px;color:var(--primary);cursor:pointer;font-weight:600"><i class="fas fa-magnifying-glass"></i> 郵便番号がわからない方は、住所から検索</a></div>`;
+  if(o.addrSearchOpen){
+    h+=`<div class="card" style="background:var(--soft);margin-bottom:14px"><div style="font-size:12.5px;font-weight:600;margin-bottom:7px">住所から郵便番号を検索</div><div style="display:flex;gap:8px;margin-bottom:8px"><input id="addr-q" value="${esc(o.addrSearchQuery)}" placeholder="例）中央区八重洲" style="flex:1;min-width:0;border:1px solid #d6d0c4;border-radius:9px;padding:10px 12px;font-size:14px;font-family:inherit" oninput="setAddrQuery(this.value)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();runAddrSearch();}"><button class="btn btn-p" style="flex:0 0 auto;padding:10px 16px" onclick="runAddrSearch()">検索</button></div>`;
+    if(o.addrSearchResults&&o.addrSearchResults.length){h+=o.addrSearchResults.map((r,i)=>`<label class="addr-cand" onclick="pickAddrSearch(${i})"><span><b>〒${fmtZip(r.zip)}</b>　${esc(r.pref)}${esc(r.town)}</span></label>`).join('');}
+    else if(o.addrSearchResults){h+=`<div class="hint">該当する住所が見つかりませんでした。キーワードを変えてお試しください。</div>`;}
+    else{h+=`<div class="hint">市区町村＋町名（例：中央区八重洲）で検索できます。選ぶと郵便番号に反映します。</div>`;}
+    h+=`</div>`;
+  }
+  if(o.addrCandidates&&o.addrCandidates.length){
+    h+=`<div class="fld"><label>住所候補 <span class="req">*</span></label><select onchange="selectAddr(this.value)"><option value="">選択してください</option>${o.addrCandidates.map(a=>`<option value="${a.addressId}" ${o.addrSelectedId===a.addressId?'selected':''}>${esc(a.pref+a.addr1)}</option>`).join('')}</select></div><div class="hint" style="margin:-6px 0 12px">選択した住所候補ごとの住所コード（郵便番号とは別）を住所連携（zebra）に渡します。</div>`;
+  }else if(o.addrSearchedZip){
+    h+=`<div class="addr-res warn"><i class="fas fa-triangle-exclamation"></i> この郵便番号に該当する住所がありませんでした。郵便番号をご確認いただくか、上の「住所から検索」をご利用ください。</div>`;
+  }else{
+    h+=`<div class="hint" style="margin-bottom:12px">郵便番号を入力すると住所候補が表示されます。</div>`;
+  }
+  h+=`<div class="fld"><label>都道府県 <span class="req">*</span></label><input value="${esc(o.pref)}" placeholder="住所候補から自動入力" readonly tabindex="-1" style="background:var(--soft);color:#6b5e50"></div>`;
+  h+=`<div class="fld"><label>市区町村 <span class="req">*</span></label><input value="${esc(o.addr1)}" placeholder="住所候補から自動入力" readonly tabindex="-1" style="background:var(--soft);color:#6b5e50"></div>`;
+  h+=`<div class="fld"><label>以降住所 <span class="req">*</span></label><input id="o-addr2" value="${esc(o.addr2)}" placeholder="1-2-32" oninput="orderInput('addr2',this.value)"></div>`;
+  h+=`<div class="fld" style="margin-bottom:0"><label>建物名・部屋番号（任意）</label><input id="o-building" value="${esc(o.building)}" placeholder="STATION Ai 063" oninput="orderInput('building',this.value)"></div>`;
+  return h;
+}
+function renderOrderer(){
+  if(!orderer.sei&&!orderer.mei&&!orderer.company&&cart.length){
+    const l=cart[0].label;
+    if(l.kind==='individual'){
+      const nm=(l.names[0].name||'').trim();const sp=nm.split(/[ 　]+/).filter(Boolean);
+      if(sp.length>=2){orderer.sei=sp[0];orderer.mei=sp.slice(1).join(' ');}
+      const ka=(l.names[0].kana||'').trim();const kp=ka.split(/[ 　]+/).filter(Boolean);
+      if(kp.length>=2){orderer.kanaSei=kp[0];orderer.kanaMei=kp.slice(1).join(' ');}else if(kp.length===1&&sp.length>=2){orderer.kanaSei=kp[0];}
+    }else{
+      const c=l.corp;const type=c.type==='（記載なし）'?'':c.type;orderer.company=(type+c.company).trim();
+      const nm=(c.name||'').trim();const sp=nm.split(/[ 　]+/).filter(Boolean);if(sp.length>=2){orderer.sei=sp[0];orderer.mei=sp.slice(1).join(' ');}
+    }
+  }
+  const o=orderer;
+  const fld=(k,lab,ph,req)=>`<div class="fld"><label>${lab}${req?' <span class="req">*</span>':''}</label><input id="o-${k}" value="${esc(o[k])}" placeholder="${ph}" oninput="orderInput('${k}',this.value)"></div>`;
+  const corp=o.kind==='corporate';
+  const nl=corp?'ご担当者 ':'';
+  let html=`<div class="sec-lead mser"><i class="fas fa-user"></i> ご注文者情報</div><div class="card">
+    <div style="font-size:12.5px;font-weight:600;margin-bottom:8px">ご注文者区分</div>
+    <div class="toggle" style="margin-bottom:14px"><button class="${corp?'':'on'}" onclick="setOKind3('individual')">個人</button><button class="${corp?'on':''}" onclick="setOKind3('corporate')">法人・団体</button></div>`;
+  if(corp){
+    html+=fld('company','法人名','株式会社〇〇',1);
+    html+=`<div class="fld"><label>法人名フリガナ <span class="req">*</span></label><input id="o-companyKana" value="${esc(o.companyKana)}" placeholder="カブシキガイシャ〇〇" oninput="orderInput('companyKana',this.value)"></div>`;
+    html+=`<div class="grid2">${fld('dept','部署名（任意）','営業部',0)}<div class="fld"><label>部署名フリガナ（任意）</label><input id="o-deptKana" value="${esc(o.deptKana)}" placeholder="エイギョウブ" oninput="orderInput('deptKana',this.value)"></div></div>`;
+  }
+  html+=`<div class="grid2">${fld('sei',nl+'姓','山田',1)}${fld('mei',nl+'名','太郎',1)}</div>
+    <div class="grid2">${fld('kanaSei','フリガナ（姓）','ヤマダ',1)}${fld('kanaMei','フリガナ（名）','タロウ',1)}</div>
+    ${fld('email','メールアドレス','example@itowa71.com',1)}
+    <div class="hint" style="margin:-7px 0 13px"><i class="fas fa-envelope" style="color:var(--gold)"></i> Web注文のため、ご注文確認・領収書送付にメールアドレスが必須です。</div>
+    ${fld('phone','電話番号','09012345678',1)}
+  </div>
+  <div class="sec-lead mser" style="font-size:15px;margin-top:16px"><i class="fas fa-location-dot"></i> ご住所</div>
+  <div class="card">${addressSection()}</div>
+  <div class="hint">${corp?'法人でのご注文です。':'お名札①のお名前を反映しています。'}漢字入力ではフリガナを自動でカタカナ予測します（編集可）。</div>`;
+  C().innerHTML=html;
+  [['sei','kanaSei'],['mei','kanaMei'],['company','companyKana']].forEach(pr=>{
+    const se=document.getElementById('o-'+pr[0]),de=document.getElementById('o-'+pr[1]);if(!se||!de)return;
+    se.addEventListener('input',()=>{if(!se.value){de.value='';orderer[pr[1]]='';return;}const hit=predictKana(se.value);if(hit){de.value=hit;orderer[pr[1]]=hit;renderBar();}});
+  });
+}
+
+function renderPayment(){
+  if(!billingName)billingName=defaultBilling();
+  const opt=(id,t,d)=>`<div class="pay-opt ${payMethod===id?'on':''}" onclick="setPay('${id}')"><div class="radio"></div><div><div class="t">${t}</div>${d?`<div class="d">${d}</div>`:''}</div></div>`;
+  let items=cart.map(c=>`<div class="sumrow"><span>${c.name}<br><span style="font-size:11px;color:var(--muted)">名札：${composeLabel(c.label)||'—'}</span></span><span>${yen(c.price)}</span></div>`).join('');
+  const on=orderer.kind==='corporate'?(esc(orderer.company)+'　'+(orderer.sei+' '+orderer.mei).trim()+' 様'):((orderer.sei+' '+orderer.mei).trim()+' 様');
+  const isReceipt=payMethod==='card';
+  const billLabel=isReceipt?'領収書宛名':'請求先宛名';
+  const billing=`<div class="card"><div class="fld" style="margin-bottom:0"><label>${billLabel} <span class="req">*</span></label><input value="${esc(billingName)}" placeholder="${isReceipt?'領収書のお宛名':'ご請求書のお宛名'}" oninput="setBilling(this.value)"><div class="hint" style="margin-top:5px">${isReceipt?'領収書のお宛名です。':'ご請求書・お振込のお宛名です。'}初期値はご注文者名です。</div></div></div>`;
+  const kugePrev=(()=>{const ks=cart.filter(c=>c.cat==='kuge');if(!ks.length)return '';return `<div class="sec-lead mser" style="margin-top:20px"><i class="fas fa-image"></i> 名札プレビュー</div><div class="hint" style="margin-bottom:10px">実際にお届けする名札のイメージです（サンプル）。</div><div style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center">`+ks.map(c=>`<div style="text-align:center"><div class="fuda">${fudaHtml(c.label)}</div><div class="hint" style="margin-top:5px;max-width:130px">${esc(c.name)}</div></div>`).join('')+`</div>`;})();
+  const billRow=`<div class="sumrow"><span>${billLabel}</span><span>${esc(billingName)||'—'} 様</span></div>`;
+  C().innerHTML=`<div class="sec-lead mser"><i class="fas fa-credit-card"></i> お支払い方法</div>
+    ${opt('invoice','請求書払い（郵送）','コンビニ・郵便局・PayPay・銀行振込でお支払い')}
+    ${opt('card','クレジットカード','')}
+    ${opt('bank','銀行振込','お振込用の請求書をメールでお届けします')}
+    ${opt('hall','会場支払い','葬儀会場でお支払い')}
+    ${billing}
+    <div class="sec-lead mser" style="margin-top:20px"><i class="fas fa-receipt"></i> ご注文内容（${cart.length}件）</div>
+    <div class="card">${items}<div class="sumrow"><span>ご注文者</span><span>${on}</span></div>${billRow}<div class="sumrow"><span>メール</span><span style="font-size:12px">${orderer.email||'—'}</span></div><div class="sumrow total"><span>お支払い金額</span><span>${yen(cartTotal())}</span></div></div>${kugePrev}`;
+}
+function setPay(id){payMethod=id;renderPayment();renderBar();}
+function setBilling(v){billingName=v;renderBar();}
+function defaultBilling(){return orderer.kind==='corporate'?(orderer.company||''):((orderer.sei+' '+orderer.mei).trim());}
+
+function renderComplete(){
+  document.getElementById('stepper').style.display='none';
+  let items=cart.map(c=>`<div class="sumrow"><span>${c.name}<br><span style="font-size:11px;color:var(--muted)">名札：${composeLabel(c.label)}</span></span><span>${yen(c.price)}</span></div>`).join('');
+  C().innerHTML=`<div class="complete"><div class="ico"><i class="fas fa-check"></i></div>
+    <div class="mser" style="font-size:20px;margin-bottom:8px">ご注文ありがとうございました</div>
+    <div class="hint" style="margin-bottom:22px">${FUNERAL.fam}家 御葬儀に際し、心よりお悔やみ申し上げます。<br>ご注文内容の控えを ${orderer.email} 宛にお送りしました。</div>
+    <div class="card" style="text-align:left;max-width:460px;margin:0 auto">${items}<div class="sumrow"><span>お支払い</span><span>${({invoice:'請求書払い（郵送）',card:'クレジットカード',bank:'銀行振込',hall:'会場支払い'})[payMethod]}</span></div><div class="sumrow total"><span>合計</span><span>${yen(cartTotal())}</span></div></div>
+    <button class="btn btn-p" style="margin-top:22px;max-width:320px" onclick="location.reload()">追悼ページに戻る</button></div>`;
+  document.querySelector('.botbar').style.display='none';
+}
+
+function allLabels(){return cart.length>0&&cart.every(c=>labelFilledOne(c.label,c.cat));}
+function validEmail(v){return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);}
+function ordererFilled(){const base=['sei','mei','phone','zip','pref','addr1','addr2'].every(k=>orderer[k].trim())&&validEmail(orderer.email.trim());return orderer.kind==='corporate'?(base&&orderer.company.trim()&&orderer.companyKana.trim()):base;}
+function prevStep(){if(step===2.5)return 2;if(step===3)return cart.some(c=>c.cat==='kouden')?2.5:2;return step-1;}
+function renderBar(){
+  const bar=document.getElementById('botbar');const total=cartTotal();
+  let can=false,lb='次へ',act='';
+  if(step===1){can=cart.length>0;act='setStep(2)';}
+  else if(step===2){can=allLabels();act='proceedFromLabel()';}
+  else if(step===2.5){can=!!returnGift;act='setStep(3)';}
+  else if(step===3){can=ordererFilled();act='setStep(4)';}
+  else if(step===4){can=true;lb='この内容で注文する';act='submitOrder()';}
+  if(step===1){
+    const groups={};cart.forEach(c=>{groups[c.name]=(groups[c.name]||0)+1;});
+    const summary=Object.entries(groups).map(([nm,q])=>`${esc(nm)} <b style="color:var(--ink)">×${q}</b>`).join('　／　');
+    bar.innerHTML=`<div style="width:100%;display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch"><i class="fas fa-basket-shopping" style="color:var(--gold);flex-shrink:0"></i>${cart.length?`<span>${summary}</span>`:'<span>お供えを選択してください</span>'}</div>
+      <div style="display:flex;align-items:center;gap:12px"><div style="flex:0 0 auto"><div class="tt">お支払い（${cart.length}件）</div><div class="tv">${yen(total)}</div></div><button class="btn btn-p" ${can?'':'disabled'} onclick="${act}" style="margin-left:auto">${lb}</button></div>
+    </div>`;
+    return;
+  }
+  const back=step>1?`<button class="btn btn-g" onclick="setStep(${prevStep()})">戻る</button>`:'';
+  bar.innerHTML=`${back}<div style="flex:0 0 auto;margin-right:4px"><div class="tt">お支払い</div><div class="tv">${yen(total)}</div></div><button class="btn btn-p" ${can?'':'disabled'} onclick="${act}">${lb}</button>`;
+}
+function catLabelOf(id){return ({kuge:'供花・供物',telegram:'弔電',kouden:'香典'})[id]||id;}
+function availCats(){return ['kuge','telegram','kouden'].filter(id=>PRODUCTS.some(p=>p.cat===id));}
+function missingCats(){const inCart=new Set(cart.map(c=>c.cat));return availCats().filter(id=>!inCart.has(id));}
+function proceedFromLabel(){
+  if(!crossSellShown){const m=missingCats();if(m.length){crossSellShown=true;document.getElementById('cross-msg').innerHTML='一緒に「'+m.map(catLabelOf).join('・')+'」もお送りになりませんか？';document.getElementById('crossModal').classList.add('show');return;}}
+  goAfterLabel();
+}
+function crossGoProducts(){document.getElementById('crossModal').classList.remove('show');setStep(1);}
+function crossGoOrderer(){document.getElementById('crossModal').classList.remove('show');goAfterLabel();}
+function goAfterLabel(){if(cart.some(c=>c.cat==='kouden'))setStep(2.5);else setStep(3);}
+function renderReturnGift(){
+  const kd=cart.find(c=>c.cat==='kouden');
+  let html=`<div class="sec-lead mser">香典返しをお選びください</div>`;
+  html+=`<div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px"><div><div style="font-size:11px;color:var(--muted)">選択中の香典</div><div style="font-weight:600;font-size:15px">${kd?esc(kd.name):'香典'}</div></div><div style="font-weight:600;font-size:15px;white-space:nowrap">${kd?yen(kd.price):''}</div></div>`;
+  html+=`<div class="card" style="border-left:4px solid var(--primary);background:var(--soft);display:flex;gap:10px;margin-bottom:14px;padding:12px 14px"><i class="fas fa-circle-info" style="color:var(--primary);margin-top:2px"></i><div style="flex:1"><div style="font-weight:600;font-size:13px;margin-bottom:4px">香典返しのお届けについて</div><div style="font-size:12px;color:var(--muted);line-height:1.6">お選びいただいた香典返しは、<b style="color:var(--ink)">ご注文者さま宛て</b>にお届けします。</div><div style="font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding-top:7px;margin-top:7px">のし・掛け紙は葬儀社の設定に従います。</div></div></div>`;
+  html+=`<div role="radiogroup">`+RETURN_GIFTS.map(g=>`<div class="pcard" style="${returnGift===g.id?'border-color:var(--gold);box-shadow:0 2px 12px rgba(176,146,90,.18);':''}margin-bottom:10px" onclick="setReturnGift('${g.id}')"><div class="pcard-img" style="width:66px;flex:0 0 66px;display:flex;align-items:center;justify-content:center;color:#c3bba8"><img src="${IMG}" alt=""></div><div class="pcard-body"><div class="pnm">${g.name}</div><div class="pcode">${g.desc}</div><div class="pcard-foot"><span class="pprice">${yen(g.price)}</span>${returnGift===g.id?'<i class="fas fa-circle-check" style="color:var(--gold);font-size:20px"></i>':''}</div></div></div>`).join('')+`</div>`;
+  C().innerHTML=html;
+}
+function setReturnGift(id){returnGift=id;renderReturnGift();renderBar();}
+function submitOrder(){const pm=({invoice:'請求書払い（郵送）',card:'クレジットカード',bank:'銀行振込',hall:'会場支払い'})[payMethod];if(payMethod==='card'){if(!confirm('クレジットカード決済に進みます。よろしいですか？'))return;}else if(!confirm(pm+'で注文します。SMS認証に進む場合があります。よろしいですか？'))return;setStep(5);}
+render();
+</script>
+</body></html>

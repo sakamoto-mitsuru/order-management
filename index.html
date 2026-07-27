@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>itowa 注文管理モック（biz.itowa71.com）</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&display=swap" rel="stylesheet">
+<style>
+  :root{--nav:#16202b;--nav2:#1c2836;--active:#2563eb;--green:#1aa06d;--ink:#1f2937;--muted:#6b7280;--line:#e5e7eb;--bg:#f6f4ef;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Noto Sans JP","Hiragino Sans",system-ui,sans-serif;color:var(--ink);background:var(--bg)}
+  .shell{display:flex;height:100vh;overflow:hidden}
+  .sidebar{width:250px;background:var(--nav);color:#c7cdd6;flex-shrink:0;display:flex;flex-direction:column}
+  .brand{display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;font-size:26px;font-weight:700;padding:20px 0 14px}
+  .evt{margin:0 16px 14px;background:var(--green);color:#fff;border-radius:8px;text-align:center;padding:11px 0;font-weight:600;font-size:15px}
+  .nav-item2{display:flex;align-items:center;gap:12px;padding:11px 20px;font-size:15px;cursor:pointer;color:#c7cdd6;text-decoration:none}
+  .nav-item2 i{width:20px;text-align:center;font-size:16px}
+  .nav-item2:hover{background:var(--nav2);color:#fff}
+  .nav-item2.active{background:var(--active);color:#fff}
+  .nav-item2 .chev{margin-left:auto;font-size:12px;opacity:.6}
+  .foot{margin-top:auto;padding:16px 20px;font-size:11px;color:#5b6472}
+  .main{flex:1;min-width:0;display:flex;flex-direction:column}
+  .topbar{background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:12px 22px}
+  .topbar .title{font-weight:600}.topbar .spacer{flex:1}
+  .btn-form{background:var(--green);color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:14px;font-weight:600}
+  .content{padding:20px 22px 40px;overflow:auto;flex:1;min-height:0}
+  .crumb{font-size:13px;color:var(--muted);margin-bottom:10px}
+  .crumb a{color:var(--active);text-decoration:none;cursor:pointer}
+  .page-h{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .page-h h1{font-size:22px;font-weight:700;margin:0}
+  .card2{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+  /* filter */
+  .filter{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:12px;align-items:end}
+  .basetabs{display:flex;align-items:center;gap:12px;margin:12px 0 2px;flex-wrap:wrap}
+  .basetabs-row{display:flex;gap:6px;flex-wrap:wrap}
+  .basetab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 15px;font-size:13px;cursor:pointer;color:#374151;display:inline-flex;align-items:center;gap:6px}
+  .basetab.on{background:#2563eb;color:#fff;border-color:#2563eb;font-weight:600}
+  .basedot{width:7px;height:7px;border-radius:50%;background:#f59e0b;display:inline-block}
+  .basetab.on .basedot{background:#fde68a}
+  .pending-badge{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600}
+  .filter label{font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px}
+  .filter input,.filter select{width:100%;border:1px solid #d1d5db;border-radius:6px;padding:7px 9px;font-size:13px}
+  .filter .btns{display:flex;gap:8px}
+  .btn-b{border:none;border-radius:7px;padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer}
+  .btn-blue{background:var(--active);color:#fff}.btn-green{background:var(--green);color:#fff}
+  .btn-ghost{background:#fff;border:1px solid #cbd5e1;color:#374151;border-radius:7px;padding:7px 14px;font-size:13px;cursor:pointer}
+  /* table */
+  table.tb{width:100%;border-collapse:collapse;font-size:13px}
+  table.tb th{text-align:left;color:#6b7280;font-weight:600;padding:9px 10px;border-bottom:2px solid var(--line);white-space:nowrap}
+  table.tb td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
+  table.tb tr:hover td{background:#fafbfc}
+  .fam{color:var(--active);font-weight:600;cursor:pointer}
+  .soon{background:#faeeda;color:#b45309;font-size:11px;padding:2px 7px;border-radius:5px;font-weight:600;margin-left:6px}
+  .cnt-chips{display:flex;gap:5px;flex-wrap:wrap}
+  .ch{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 7px;border-radius:5px;font-weight:600;white-space:nowrap}
+  .row-act{display:flex;gap:6px;justify-content:flex-end}
+  .mini{border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;white-space:nowrap}
+  .mini.phone{background:#eff6ff;border-color:#93c5fd;color:#1d4ed8;font-weight:600}
+  /* aggregate cards */
+  .agg{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+  .agg .box{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .agg .lb{font-size:12px;color:var(--muted)}
+  .agg .vl{font-size:22px;font-weight:700;margin-top:2px}
+  .agg .brk{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .status{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600}
+  .st-ok{background:#e1f5ee;color:#0f6e56}.st-cancel{background:#fde8e8;color:#b91c1c}.st-pend{background:#fef3c7;color:#92400e}
+  /* proxy screen */
+  .order-layout{display:grid;grid-template-columns:230px 1fr;gap:18px;align-items:start}
+  .rail{position:sticky;top:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}
+  .rail h6{font-size:11px;color:var(--muted);margin:0 0 8px;font-weight:600}
+  .step{display:flex;align-items:center;gap:8px;font-size:13px;padding:5px 0;color:var(--muted);cursor:pointer}
+  .step i{font-size:15px}.step.done{color:#374151}.step.done i{color:var(--green)}
+  .step.cur{color:#185fa5;font-weight:600}.step.cur i{color:var(--active)}
+  .rail hr{margin:12px 0;border-color:var(--line)}
+  .memo-fam{font-weight:600;font-size:13px}.memo-sub{color:var(--muted);font-size:12px;margin-bottom:8px}
+  .memo-item{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;gap:8px}
+  .memo-item .rm{color:#c0392b;cursor:pointer;font-size:11px}
+  .memo-total{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:8px;padding-top:8px;font-weight:700;font-size:14px}
+  .sec{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+  .sec.focus{border-color:#bcd3f5;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+  .sec-title{display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;margin-bottom:12px}
+  .sec-title .chk{margin-left:auto;color:var(--green);font-size:14px;display:none}
+  .sec.completed .sec-title .chk{display:inline}
+  .fam-card{display:flex;align-items:center;gap:12px;background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+  .fam-card .g{width:38px;height:38px;border-radius:50%;background:#e6f1fb;color:#185fa5;display:flex;align-items:center;justify-content:center;font-weight:600}
+  .cat-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .cat{border:1px solid #d1d5db;background:#fff;border-radius:18px;padding:5px 14px;font-size:13px;cursor:pointer}
+  .cat.on{background:#fde68a;border-color:#fcd34d;color:#7c5a10;font-weight:600}
+  .cat.disabled{background:#f3f4f6;color:#9ca3af;cursor:not-allowed;border-style:dashed}
+  .prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .prod{border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px}
+  .prod .ph{height:60px;border-radius:6px;background:#eef2f7;display:flex;align-items:center;justify-content:center;color:#c3cbd6;font-size:20px}
+  .prod .cat-l{font-size:11px;color:#9aa3af}.prod .nm{font-size:13px;font-weight:600;line-height:1.3}.prod .pr{font-size:13px}
+  .prod button{margin-top:auto;border:none;background:#e8b93f;color:#4a3a00;font-weight:600;border-radius:20px;padding:7px 0;font-size:13px;cursor:pointer}
+  .note-box{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:8px;padding:12px;font-size:13px}
+  .lbl-block{border:1px solid var(--line);border-radius:9px;padding:12px;margin-bottom:10px;background:#fbfcfd}
+  .lbl-block .h{font-size:13px;font-weight:600;margin-bottom:8px;display:flex;gap:6px;align-items:center}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .chip{border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer}
+  .chip:hover{background:#eff6ff;border-color:#93c5fd}
+  .lbl-block textarea{width:100%;border:1px solid #d1d5db;border-radius:6px;padding:8px;font-size:13px;resize:vertical;min-height:44px}
+  .furigana{font-size:11px;color:var(--muted);margin-top:5px}
+  .empty-hint{color:var(--muted);font-size:13px;padding:8px 0}
+  .toggle{display:inline-flex;border:1px solid #d1d5db;border-radius:8px;overflow:hidden;margin-bottom:12px}
+  .toggle button{border:none;background:#fff;padding:7px 18px;font-size:13px;cursor:pointer}
+  .toggle button.on{background:var(--active);color:#fff}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .fld label{font-size:12px;color:#374151;font-weight:600;display:block;margin-bottom:3px}.fld .req{color:#dc2626}
+  .fld input,.fld select{width:100%;border:1px solid #d1d5db;border-radius:6px;padding:7px 9px;font-size:13px}
+  .fld{margin-bottom:10px}.fld.full{grid-column:1/-1}
+  .pay-opt{display:flex;align-items:flex-start;gap:10px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+  .pay-opt.on{border-color:var(--active);background:#f0f6ff}.pay-opt .d{font-size:12px;color:var(--muted)}
+  .np-panel{border:1px dashed #cbd5e1;border-radius:9px;padding:14px;margin-top:6px}
+  .np-btn{background:var(--active);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-weight:600;font-size:14px;cursor:pointer}
+  .np-btn:disabled{background:#cbd5e1;cursor:not-allowed}
+  .np-note{font-size:12px;color:var(--muted);margin-left:10px}
+  .result{margin-top:12px;border-radius:8px;padding:12px;font-size:13px;display:none}
+  .result.ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
+  .result.ng{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+  .wbtn{margin-top:8px;background:#2b579a;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer}
+  .actionbar{position:fixed;left:250px;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:none;align-items:center;gap:14px;padding:12px 24px;z-index:20}
+  .actionbar .tl{font-size:12px;color:var(--muted)}.actionbar .tv{font-size:20px;font-weight:700}.actionbar .warn{color:#b45309;font-size:12px}
+  .primary{margin-left:auto;background:var(--active);color:#fff;border:none;border-radius:8px;padding:11px 26px;font-weight:600;font-size:15px;cursor:pointer}
+  .primary.confirm{background:var(--green)}.primary:disabled{background:#cbd5e1;cursor:not-allowed}
+  .hint{font-size:12px;color:var(--muted)}
+  .hide{display:none}
+
+  .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-start;justify-content:center;z-index:100;overflow:auto;padding:26px 16px}
+  .modal-ov.show{display:flex}
+  .modal-bx{background:#fff;border-radius:10px;width:560px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+  .modal-hd{display:flex;align-items:center;justify-content:center;position:relative;padding:16px;border-bottom:1px solid var(--line)}
+  .modal-hd h3{margin:0;font-size:20px;font-weight:700}
+  .modal-hd .x{position:absolute;right:16px;top:14px;cursor:pointer;color:#9ca3af;font-size:18px;background:none;border:none}
+  .modal-bd{padding:18px 22px}
+  .sms-conf{text-align:center;font-size:16px;margin-bottom:14px}
+  .sms-fld{margin-bottom:12px}
+  .sms-fld label{font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px}
+  .sms-fld input{width:100%;border:1px solid #d1d5db;border-radius:8px;padding:12px;font-size:15px}
+  .sms-send{display:block;margin:6px auto 16px;background:var(--active);color:#fff;border:none;border-radius:8px;padding:11px 34px;font-size:15px;font-weight:600;cursor:pointer}
+  .sms-guide h4{font-size:15px;margin:0 0 10px}
+  .sms-guide p{background:#f8fafc;border-radius:6px;padding:8px 10px;font-size:13px;margin:0 0 8px;color:#374151}
+  .url-copy{display:block;margin:8px auto 0;background:#6b7280;color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:14px;cursor:pointer}
+  .offer-note{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px}
+  .mini-phone{width:220px;margin:8px auto 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#f6f4ef}
+  .mini-tabs{display:flex;background:#fff;font-size:11px}
+  .mini-tabs div{flex:1;text-align:center;padding:9px 0;color:#c8ccd2;text-decoration:line-through}
+  .mini-tabs div.on{color:#16202b;font-weight:700;text-decoration:none;border-bottom:2px solid #16202b}
+
+  .fax-paper{background:#fff;color:#111;border:1px solid #333;padding:18px 20px;width:210mm;min-height:297mm;box-sizing:border-box;margin:0 auto 16px}
+  .fax-hd{text-align:center;border-bottom:2px solid #111;padding-bottom:8px;margin-bottom:10px}
+  .fax-title{font-size:18px;font-weight:700;letter-spacing:2px}
+  .fax-sub{font-size:11px;margin-top:4px}
+  .fax-to{font-size:14px;font-weight:700;margin-bottom:8px}
+  .fax-paper p{margin:0 0 10px;font-size:12px;line-height:1.6}
+  .fax-info,.fax-order,.fax-orderer{width:100%;border-collapse:collapse;margin-bottom:10px;font-size:12px}
+  .fax-info th,.fax-info td,.fax-order th,.fax-order td,.fax-orderer th,.fax-orderer td{border:1px solid #333;padding:5px 8px;color:#111}
+  .fax-info th,.fax-order th,.fax-orderer th{background:#f0f0f0;font-weight:600;white-space:nowrap}
+  .fax-order td{height:26px}
+  .fax-orderer th{width:74px}
+  .fax-sec{font-weight:700;margin:12px 0 6px;font-size:12px}
+  .fax-pay{margin:8px 0;font-size:12px}
+  .fax-ft{border-top:1px solid #333;padding-top:8px;margin-top:8px;font-size:11px;text-align:center}
+
+  .fax-nafuda-row{display:flex;gap:8px;margin-bottom:6px}
+  .fax-nafuda{flex:1;border:1px solid #333;display:flex;flex-direction:column}
+  .fn-code{border-bottom:1px solid #333;padding:6px;font-size:11px}
+  .fn-vert{height:210px;writing-mode:vertical-rl;padding:8px;color:#aaa;font-size:11px}
+  .fax-note{font-size:11px;color:#333;margin:6px 0}
+  .fax-items{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px}
+  .fax-items th,.fax-items td{border:1px solid #333;padding:5px 8px;color:#111}
+  .fax-items th{background:#f0f0f0;font-weight:600}
+  .fax-qr-row{display:flex;align-items:center;gap:14px;justify-content:center;margin:12px 0}
+  .fax-qr{width:100px;height:100px;display:flex;align-items:center;justify-content:center;border:1px solid #ccc}
+  .fax-qr-cap{font-size:11px;line-height:1.6;color:#111}
+
+  .fax-top{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:6px}
+  .fax-top-l{flex:1}
+  .fax-top-l p{margin:8px 0 0;font-size:12px;line-height:1.6;color:#111}
+  .fax-sort{border:1.5px solid #111;padding:10px 8px;text-align:center;width:124px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .fax-sort-no{font-size:11px;line-height:1.4;color:#111}
+  .fax-sort-no b{font-size:13px}
+  .fax-sort-qr{width:96px;height:96px;margin:0 auto 4px;display:flex;align-items:center;justify-content:center}
+  .fax-sort-cap{font-size:9px;color:#333}
+  .fax-warn{border:1.5px solid #111;background:#eee;padding:8px 10px;font-size:12px;font-weight:700;margin:8px 0 10px;line-height:1.6;color:#111}
+
+  .fuda{width:176px;height:340px;background:#fff;border:1px solid #c8b88a;padding:14px 8px 16px;display:flex;flex-direction:column;align-items:center;font-family:"Yuji Syuku","Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif;flex-shrink:0}
+  .fuda-hd{display:flex;gap:6px;color:#1a1a1a;margin-bottom:16px}
+  .fuda-hd span{font-size:26px;line-height:1}
+  .fuda-body{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;flex:1;color:#1a1a1a}
+  .fuda-col{display:flex;flex-direction:column;align-items:center}
+  .lbl-2col{display:flex;gap:14px;align-items:flex-start}
+  .lbl-form{flex:1;min-width:0}
+  .lbl-fuda{flex-shrink:0;position:sticky;top:64px;align-self:flex-start}
+  .chip.chip-on{background:#2563eb;color:#fff;border-color:#2563eb}
+
+  .fuda-row{display:flex;flex-direction:row-reverse;align-items:flex-start;justify-content:center;gap:10px}
+  .fuda-note{font-size:10px;color:#9ca3af;margin-top:6px;text-align:center;width:176px;line-height:1.4}
+  .pbanner{position:sticky;top:0;z-index:20;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .ppill{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:4px 10px;border-radius:999px;background:#f1f5f9;color:#64748b;font-weight:600}
+  .ppill.ok{background:#dcfce7;color:#15803d}
+  .ppill.warn{background:#fef9c3;color:#92400e}
+  .lbadge{font-size:11px;padding:2px 8px;border-radius:999px;font-weight:600;margin-left:8px}
+  .lbadge.ok{background:#dcfce7;color:#15803d}
+  .lbadge.no{background:#fee2e2;color:#b91c1c}
+.prod-thumb{width:40px;height:40px;object-fit:contain;border:1px solid var(--line);border-radius:6px;background:#fff;vertical-align:middle;margin-right:8px}
+
+  .fax-footer-row{display:flex;gap:12px;align-items:center;border-top:1.5px solid #111;margin-top:10px;padding-top:8px}
+  .fax-footer-qr{flex-shrink:0;text-align:center}
+  .fax-footer-qr>div:first-child{width:92px;height:92px;display:flex;align-items:center;justify-content:center;border:1px solid #ccc;margin:0 auto}
+  .fax-footer-note{font-size:11px;line-height:1.6;color:#111}
+  .fax-bank{font-size:11px;border:1px solid #333;padding:6px 8px;margin-top:8px;color:#111}
+
+  .ocr-banner{display:flex;align-items:center;gap:6px;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:13px;cursor:pointer}
+  .ocr-banner:hover{background:#fef3c7}
+
+  .inv-paper{background:#fff;border:1px solid var(--line);border-radius:8px;padding:18px 20px;color:#111}
+  .inv-hd{border-bottom:2px solid #111;padding-bottom:6px;margin-bottom:6px}
+  .inv-tbl{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+  .inv-tbl th,.inv-tbl td{border:1px solid #333;padding:6px 8px;color:#111}
+  .inv-tbl th{background:#f0f0f0}
+  .inv-edit{border-bottom:1px dashed #94a3b8;padding:0 2px;outline:none;background:#f8fafc}
+  .inv-edit:focus{background:#fef9c3}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><i class="fas fa-cloud"></i> itowa</div>
+    <div class="evt"><i class="fas fa-exchange-alt me-1"></i> イベント管理</div>
+    <a class="nav-item2 active" onclick="go('list')"><i class="fas fa-phone"></i>注文管理</a>
+    <a class="nav-item2"><i class="fas fa-users"></i>葬家管理</a>
+    <a class="nav-item2"><i class="fas fa-store-alt"></i>業者管理</a>
+    <a class="nav-item2"><i class="fas fa-gifts"></i>商品管理</a>
+    <a class="nav-item2"><i class="fas fa-gift"></i>返礼品管理<i class="fas fa-chevron-left chev"></i></a>
+    <a class="nav-item2"><i class="fas fa-calendar-plus"></i>スケジュール管理<i class="fas fa-chevron-left chev"></i></a>
+    <a class="nav-item2"><i class="far fa-clock"></i>操作ログ</a>
+    <a class="nav-item2"><i class="far fa-list-alt"></i>担当者別葬儀履歴</a>
+    <a class="nav-item2"><i class="far fa-list-alt"></i>月別累計売上高</a>
+    <a class="nav-item2"><i class="fas fa-flask"></i>名札生成</a>
+    <a class="nav-item2"><i class="fas fa-cogs"></i>設定<i class="fas fa-chevron-left chev"></i></a>
+    <div class="foot">2026 (c) itowa-inc.<br>All Rights Reserved.</div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <span class="title">いとわ葬祭様 管理画面</span>
+      <span class="spacer"></span>
+      <button class="btn-form" onclick="alert('注文フォーム：故人名の検索ページへ遷移します。検索後の注文ページも「贈る」タブのみ表示（喪主名保護）に制限します。')">注文フォーム</button>
+      <span><i class="fas fa-user-circle"></i> サポート <i class="fas fa-caret-down"></i></span>
+    </div>
+
+    <div class="content">
+      <!-- ============ SCREEN 1: 葬家一覧 ============ -->
+      <div id="screen-list">
+        <div class="page-h"><h1><i class="fas fa-phone text-primary"></i> 注文管理</h1><button class="btn-b btn-ghost" style="margin-left:auto" onclick="exportAllCsv()"><i class="fas fa-file-csv"></i> CSV（全件）</button><button class="btn-b btn-blue" onclick="openOcr()"><i class="far fa-file-pdf"></i> FAX取り込み(OCR)</button></div>
+        <div id="base-tabs" class="basetabs"></div>
+        <div id="ocr-banners" style="margin:12px 0"></div>
+        <div class="card2">
+          <div class="filter">
+            <div><label>葬儀式日(From)</label><input type="date" id="fFrom" value="2026-07-24"></div>
+            <div><label>葬儀式日(To)</label><input type="date" id="fTo"></div>
+            <div><label>葬家検索</label><input id="fFam" placeholder="故人名で検索" oninput="renderFuneralList()"></div>
+            <div><label>会場検索</label><select id="fHall"><option value="">すべて</option></select></div>
+            <div class="btns"><button class="btn-b btn-ghost" onclick="renderFuneralList()">再読み込み</button><button class="btn-b btn-blue" onclick="renderFuneralList()">検索</button></div>
+          </div>
+        </div>
+        <div class="card2">
+          <div style="overflow-x:auto">
+            <table class="tb">
+              <thead><tr>
+                <th>故人名</th><th>会場名</th><th>担当者</th><th>通夜</th><th>葬儀</th><th>注文数（カテゴリ別）</th><th style="text-align:right">操作</th>
+              </tr></thead>
+              <tbody id="funeral-rows"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ SCREEN 2: 注文リスト ============ -->
+      <div id="screen-orders" class="hide">
+        <div class="crumb"><a onclick="go('list')">注文管理</a> <i class="fas fa-angle-right"></i> <span id="ord-crumb"></span></div>
+        <div class="page-h"><h1 id="ord-title">注文リスト</h1>
+          <button class="btn-b btn-ghost" style="margin-left:auto" onclick="exportOrdersCsv()"><i class="fas fa-file-csv"></i> CSVダウンロード</button><button class="btn-b btn-ghost" id="ord-sms-btn"><i class="far fa-paper-plane"></i> 送信</button><button class="btn-b btn-blue" id="ord-proxy-btn"><i class="fas fa-phone"></i> 注文作成</button>
+        </div>
+        <div class="card2" id="obi-card" style="margin-bottom:14px"></div>
+        <div class="agg" id="agg"></div>
+        <div class="card2">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <input id="ordSearch" placeholder="検索（商品名・名札など）" style="border:1px solid #d1d5db;border-radius:6px;padding:7px 10px;font-size:13px;width:300px" oninput="renderOrderRows()">
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <button class="btn-ghost" onclick="alert('CSVダウンロード（デモ）')"><i class="fas fa-download"></i> CSV</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="tb">
+              <thead><tr>
+                <th>動線</th><th>項目</th><th>注文日</th><th>注文番号</th><th>商品名</th><th>お名前(名札)</th><th style="text-align:right">価格</th><th>支払い方法</th><th>ステータス</th>
+              </tr></thead>
+              <tbody id="order-rows"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card2" id="sms-history-card">
+          <div style="font-weight:600;font-size:15px;margin-bottom:10px"><i class="far fa-comment-dots"></i> SMS送信履歴</div>
+          <div style="overflow-x:auto"><table class="tb"><thead><tr><th>送信日時</th><th>手段</th><th>宛名</th><th>連絡先</th><th>送信URL</th><th>状態</th></tr></thead><tbody id="sms-rows"></tbody></table></div>
+        </div>
+        <div class="card2" id="inv-manage-card" style="display:none"></div>
+        <div class="card2" id="oplog-card" style="display:none"></div>
+      </div>
+
+      <!-- ============ SCREEN 3: 注文作成 ============ -->
+      <div id="screen-proxy" class="hide">
+        <div class="crumb"><a onclick="go('list')">注文管理</a> <i class="fas fa-angle-right"></i> <a id="proxy-crumb-order"></a> <i class="fas fa-angle-right"></i> 注文作成</div>
+        <div class="page-h"><h1><i class="fas fa-phone text-primary"></i> 注文作成</h1>
+          <span class="hint" style="margin-left:8px">電話で受けた注文をオペレーターが代理入力します</span>
+        </div>
+        <div class="pbanner" id="pbanner"></div>
+        <div class="order-layout">
+          <div class="rail">
+            <h6>進捗</h6>
+            <div id="prog-list"></div>
+            <hr>
+            <h6>受電メモ（復唱用）</h6>
+            <div class="memo-fam" id="memo-fam">—</div>
+            <div class="memo-sub" id="memo-sub">—</div>
+            <div id="memo-items"><div class="empty-hint" style="font-size:12px">商品未選択</div></div>
+            <div class="memo-total"><span>合計</span><span id="memo-total">¥0</span></div>
+          </div>
+          <div>
+            <div class="sec completed" id="sec-family">
+              <div class="sec-title"><i class="fas fa-users text-secondary"></i>葬家<i class="fas fa-circle-check chk"></i></div>
+              <div class="fam-card"><div class="g" id="fam-init">—</div>
+                <div style="flex:1"><div style="font-weight:600" id="fam-name">—</div><div class="hint" id="fam-meta">—</div></div>
+                <button class="mini" onclick="go('list')">変更</button>
+              </div>
+            </div>
+            <div class="sec focus" id="sec-items">
+              <div class="sec-title"><i class="fas fa-gifts text-secondary"></i>商品選択<span class="hint" style="margin-left:8px;font-weight:400">複数選択可</span><i class="fas fa-circle-check chk"></i></div>
+              <div class="cat-tabs">
+                <div class="cat on" data-cat="all">すべて</div>
+                <div class="cat" data-cat="flower">供花</div>
+                <div class="cat" data-cat="things">供物</div>
+                <div class="cat disabled" data-cat="message" title="今回は対象外です"><i class="fas fa-ban" style="font-size:11px"></i> 弔文</div>
+                <div class="cat disabled" data-cat="telegram" title="佐川商品のため注文できません"><i class="fas fa-ban" style="font-size:11px"></i> 弔電</div>
+                <div class="cat disabled" data-cat="kouden" title="電話注文では承れません"><i class="fas fa-ban" style="font-size:11px"></i> 香典</div>
+              </div>
+              <div class="prod-grid" id="prod-grid"></div>
+              <div id="kouden-note" class="note-box hide" style="margin-top:10px"><i class="fas fa-circle-info"></i> 香典はカード決済のみのため、電話注文では承れません。Web・注文フォームからのご案内をお願いします。</div>
+            </div>
+            <div class="sec" id="sec-label">
+              <div class="sec-title"><i class="fas fa-tag text-secondary"></i>名札入力（商品ごと）<i class="fas fa-circle-check chk"></i></div>
+              <div id="label-list"><div class="empty-hint">商品を追加すると、ここに名札の入力欄が表示されます。</div></div>
+            </div>
+            <div class="sec" id="sec-orderer">
+              <div class="sec-title"><i class="fas fa-user text-secondary"></i>注文者情報<i class="fas fa-circle-check chk"></i></div>
+              <div class="toggle" id="belongs"><button class="on" data-b="individual">個人</button><button data-b="corporation">法人</button></div>
+              <div class="grid2">
+                <div class="fld full corp" style="display:none"><label>会社名（全角）<span class="req">*</span></label><input data-f="companyName" placeholder="株式会社〇〇"></div>
+                <div class="fld full corp" style="display:none"><label>事業部・部署名（全角）</label><input data-f="departmentName" placeholder="営業部"></div>
+                <div class="fld"><label>姓<span class="req">*</span></label><input data-f="sei" placeholder="山田"></div>
+                <div class="fld"><label>名<span class="req">*</span></label><input data-f="mei" placeholder="太郎"></div>
+                <div class="fld"><label>フリガナ（姓）<span class="req">*</span></label><input data-f="kanaSei" placeholder="ヤマダ"></div>
+                <div class="fld"><label>フリガナ（名）<span class="req">*</span></label><input data-f="kanaMei" placeholder="タロウ"></div>
+                <div class="fld"><label>電話番号<span class="req">*</span></label><input data-f="phone" placeholder="09012345678"></div>
+                <div class="fld full"><label>郵便番号<span class="req">*</span></label><input data-f="zip" placeholder="4660064" id="zip" inputmode="numeric">
+                  <div style="margin-top:6px"><a onclick="mgToggleAddrSearch()" style="font-size:12px;color:#635e7a;cursor:pointer;font-weight:600"><i class="fas fa-magnifying-glass"></i> 郵便番号がわからない方は、住所から検索</a></div>
+                  <div id="mg-addr-search" style="display:none;margin-top:8px;background:#f6f4ef;border-radius:8px;padding:10px">
+                    <div style="font-size:12px;font-weight:600;margin-bottom:6px">住所から郵便番号を検索（佐川参照）</div>
+                    <div style="display:flex;gap:8px"><input id="mg-addr-q" placeholder="例）中央区八重洲" style="flex:1;border:1px solid #d6d0c4;border-radius:8px;padding:8px 10px;font-size:13px"><button type="button" class="btn-b btn-blue" onclick="mgRunAddrSearch()">検索</button></div>
+                    <div id="mg-addr-results" style="margin-top:8px"></div>
+                  </div></div>
+                <div class="fld full" id="mg-cand-wrap" style="display:none"><label>住所候補<span class="req">*</span></label><select id="mg-cand" onchange="mgSelectAddr(this.value)"><option value="">選択してください</option></select><div class="hint" style="margin-top:4px">住所候補ごとの住所コードを住所連携（zebra）に渡します（郵便番号とは別）。</div></div>
+                <div class="fld"><label>都道府県<span class="req">*</span></label><input data-f="pref" placeholder="住所候補から自動入力" id="pref" readonly style="background:#f2efe9;color:#6b5e50"></div>
+                <div class="fld"><label>市区町村<span class="req">*</span></label><input data-f="addr1" placeholder="住所候補から自動入力" id="addr1" readonly style="background:#f2efe9;color:#6b5e50"></div>
+                <div class="fld"><label>以降住所<span class="req">*</span></label><input data-f="addr2" placeholder="1-2-32"></div>
+                <div class="fld"><label>建物名・部屋番号（任意）</label><input data-f="building" placeholder="STATION Ai 063"></div>
+                
+                
+                <div class="fld full"><label>メールアドレス（任意）</label><input data-f="email" placeholder="example@example.com"></div>
+              </div>
+            </div>
+            <div class="sec" id="sec-discount">
+              <div class="sec-title"><i class="fas fa-tags text-secondary"></i>会員値引き<i class="fas fa-circle-check chk"></i></div>
+              <label style="font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:8px"><input type="checkbox" id="discChk"> 会員値引きを適用する</label>
+              <div id="discBody" style="display:none">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+                  <div class="fld" style="max-width:150px;margin-bottom:0"><label>値引率（％）</label><input id="discPct" type="number" min="0" max="100" value="0" placeholder="例：10"></div>
+                  <div class="fld" style="max-width:180px;margin-bottom:0"><label>値引き額（円）</label><input id="discYen" type="number" min="0" value="0" placeholder="例：5000"></div>
+                </div>
+                <div class="hint" style="margin-bottom:6px">値引率・値引き額のどちらか入力すると、もう一方を自動計算します。</div>
+                <div id="discLine" class="hint"></div>
+              </div>
+            </div>
+            <div class="sec" id="sec-payment">
+              <div class="sec-title"><i class="fas fa-shield-alt text-secondary"></i>決済方法<i class="fas fa-circle-check chk"></i></div>
+              <div class="pay-opt on" data-pm="np"><input type="radio" name="pm" value="np" checked>
+                <div><div style="font-weight:600">NP後払い（NP立替・入金保証）</div>
+                <div class="d">コンビニ・郵便局・銀行・PayPayで後払い。与信審査あり。手数料1万円未満277円／1万円以上0円。30万円超は銀行振込のみ。</div></div>
+              </div>
+              <div class="pay-opt" data-pm="invoice"><input type="radio" name="pm" value="invoice">
+                <div><div style="font-weight:600">自社回収請求書（Word生成）</div>
+                <div class="d">葬儀社回収。請求書（Word）を生成。宛先＝注文者／請求元・振込先＝担当葬儀社。与信不要。</div></div>
+              </div>
+              <div class="np-panel" id="npPanel">
+                <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px">
+                  <button class="np-btn" id="npBtn" disabled><i class="fas fa-shield-alt"></i> NP与信確認</button>
+                  <span class="np-note" id="npNote">必須項目が揃うと押せます</span>
+                </div>
+                <div class="result ok" id="resOk"><i class="fas fa-circle-check"></i> <b>与信OK</b>：NPが立替・入金保証します。「NP後払いで確定」で完了、または自社回収請求書に切り替えられます。</div>
+                <div class="result ng" id="resNg"><i class="fas fa-triangle-exclamation"></i> <b>与信NG</b>：NP立替対象外です。自社回収請求書（Word）で確定してください。</div>
+              </div>
+              <div class="np-panel" id="invPanel" style="display:none">
+                <div class="hint" style="margin-bottom:6px">自社回収請求書（Word）を生成します。宛先＝注文者／請求元・振込先＝担当葬儀社。</div>
+                <div class="fld" style="margin-bottom:8px"><label>SMS送信先（スマホ・携帯電話）</label><input id="invPhone" placeholder="注文者情報の電話番号を自動反映"></div>
+                <button class="wbtn" id="wbtn"><i class="far fa-file-word"></i> 請求書プレビュー・編集</button>
+              </div>
+              <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">
+                <div class="hint" style="margin-bottom:8px"><i class="fas fa-circle-info" style="color:#2563eb"></i> 管理画面からの確定は、通常の注文締切時間を過ぎていても確定できます（事後対応）。</div>
+                <label style="font-size:13px;display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600"><input type="checkbox" id="noDispatch"> 発注処理をしない（事後登録・注文FAXを送信しない）</label>
+                <div class="hint" style="margin-top:4px">既に会場へ手配済みの注文を、記録のためだけに登録する場合にチェックします。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="actionbar" id="actionbar">
+      <div><div class="tl">合計</div><div class="tv" id="bar-total">¥0</div></div>
+      <div class="warn" id="bar-warn">商品・注文者情報を入力してください</div>
+      <button class="primary" id="barBtn" disabled>NP与信確認 →</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal-ov" id="smsModal">
+  <div class="modal-bx">
+    <div class="modal-hd"><h3>注文フォーム 通知（SMS / メール）</h3><button class="x" onclick="closeSms()">×</button></div>
+    <div class="modal-bd">
+      <div class="toggle" id="smsTabs" style="margin-bottom:14px"><button class="on" data-ch="sms">SMS</button><button data-ch="fax">FAX</button><button data-ch="email">メール</button></div>
+      <div class="sms-conf" id="smsConf">電話番号の間違いが無いかご確認下さい</div>
+      <div class="sms-fld"><label>ご注文者名（ひらがな・カタカナ）</label><input id="smsName" placeholder="やまだ たろう"><div class="hint" style="margin-top:4px">漢字の間違いを防ぐため、ひらがな・カタカナでご入力ください</div><div id="smsNameWarn" style="display:none;color:#dc2626;font-size:12px;margin-top:4px">ひらがな・カタカナで入力してください</div></div>
+      <div class="sms-fld" id="fldPhone"><label>電話番号</label><input id="smsPhone" placeholder="電話番号を入力"></div>
+      <div class="sms-fld" id="fldEmail" style="display:none"><label>メールアドレス</label><input id="smsEmail" placeholder="example@example.com"></div>
+      <div class="sms-fld" id="fldFax" style="display:none"><label>送信先FAX番号</label><input id="smsFax" placeholder="0521234567"></div>
+      <button class="sms-send" id="smsSendBtn" onclick="submitSms()">SMS送信</button>
+      <div id="smsPreviewBox" style="background:#f8fafc;border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:16px"><div style="font-size:12px;font-weight:600;margin-bottom:6px"><i class="far fa-comment-dots"></i> SMS送信文面プレビュー</div><pre id="smsPreview" style="white-space:pre-wrap;font-family:inherit;font-size:13px;margin:0;line-height:1.7"></pre><div class="hint" style="margin-top:8px"><span id="smsCount"></span></div></div>
+      <div id="mailComposeBox" style="display:none;margin-bottom:16px">
+        <div class="sms-fld"><label>件名</label><input id="mailSubject"></div>
+        <div class="sms-fld" style="margin-bottom:0"><label>本文（葬儀社からの案内・編集可）</label><textarea id="mailBody" style="width:100%;min-height:300px;border:1px solid #d1d5db;border-radius:8px;padding:12px;font-size:13px;line-height:1.8;resize:vertical"></textarea></div>
+      </div>
+      <div id="faxComposeBox" style="display:none;margin-bottom:16px">
+        <div style="margin-bottom:10px"><div style="font-size:12px;font-weight:600;margin-bottom:6px">返信先FAX番号（デフォルト：拠点）</div><div class="toggle" id="faxDestTabs" style="margin-bottom:6px"><button class="on" data-d="base">拠点</button><button data-d="rep">代表</button><button data-d="hall">会場</button></div><input id="faxDestNo" style="width:100%;border:1px solid #d1d5db;border-radius:8px;padding:9px 10px;font-size:14px"><div class="hint" style="margin-top:4px">この番号がFAX用紙の返信先として記載されます（編集可）</div></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap"><span style="font-size:12px;font-weight:600">ご注文区分</span><div class="toggle" id="faxKindTabs"><button class="on" data-k="individual">個人</button><button data-k="corporation">法人</button></div></div>
+        <div class="hint" style="margin-bottom:8px"><i class="fas fa-circle-info"></i> FAXはPDF化してmovax（FAX配信）へメール送信されます。1枚目＝注文記入用紙／2枚目＝商品一覧の計2枚。</div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:6px"><i class="fas fa-fax"></i> FAX送信雛形（プレビュー・2枚）</div>
+        <div id="faxPaper"></div>
+        <div id="npOptRow" style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line)"><label style="font-size:13px;display:flex;align-items:center;gap:8px"><input type="checkbox" id="npOptOut"> NPを使用しない（葬儀社回収・振込）</label><div class="hint" style="margin-top:4px">チェックすると請求書払いは葬儀社回収（振込先を2枚目フッターに記載）になります。</div></div>
+      </div>
+      <button class="url-copy" onclick="copyUrl()"><i class="far fa-copy"></i> URLコピー</button>
+      <div class="offer-note">
+        <div style="font-size:12px;font-weight:600;margin-bottom:4px"><i class="fas fa-shield-halved"></i> 送信先＝葬家別の注文専用ページ</div>
+        <div class="hint" id="smsUrlFull">https://biz.itowa71.com/.../order-form</div>
+        <div class="hint" style="margin-top:6px">葬儀情報など他ページには遷移せず注文フォームのみ表示（喪主名の個人情報保護）。画面上部の「注文フォーム」は故人名の<b>検索用URL</b>で、これとは別物です。</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-ov" id="ocrModal">
+  <div class="modal-bx" style="width:720px">
+    <div class="modal-hd"><h3>FAX注文の取り込み（OCR）</h3><button class="x" onclick="closeOcr()">×</button></div>
+    <div class="modal-bd">
+      <div id="ocrStep1">
+        <div class="hint" style="margin-bottom:10px">返信されたFAX（複数枚可）を取り込み、訃報NOのQRで葬家ごとに仕分けて注文ドラフトを生成します。</div>
+        <button class="btn-b btn-blue" onclick="ocrImport()"><i class="far fa-file-pdf"></i> FAXファイルを選択して取り込み</button>
+        <div class="hint" style="margin-top:8px">※デモ：ボタンで複数枚の取り込みをシミュレートします。</div>
+      </div>
+      <div id="ocrStep2" style="display:none">
+        <div style="font-weight:600;margin-bottom:8px">取り込み結果（<span id="ocrCount">0</span>件）— 内容を確認してください</div>
+        <div id="ocrList"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn-ghost" onclick="closeOcr()">閉じる</button><button class="btn-b btn-blue" style="margin-left:auto" onclick="ocrToConfirm()">確定して発注へ</button></div>
+      </div>
+      <div id="ocrStep3" style="display:none">
+        <div style="background:#fef3c7;border:1px solid #fcd34d;color:#92400e;border-radius:8px;padding:12px;font-weight:600;margin-bottom:10px"><i class="fas fa-triangle-exclamation"></i> 確定すると発注を行います。以下の送信先へ注文FAXを送信します。</div>
+        <div id="ocrConfirmList"></div>
+        <div style="display:flex;gap:8px;margin-top:12px"><button class="btn-ghost" onclick="ocrBack()">戻る</button><button class="btn-b btn-green" style="margin-left:auto" onclick="ocrFinalize()"><i class="fas fa-check"></i> 送信先を確認して確定・発注</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-ov" id="navGuard">
+  <div class="modal-bx" style="width:430px">
+    <div class="modal-hd"><h3>入力中の内容があります</h3></div>
+    <div class="modal-bd">
+      <p style="font-size:14px;line-height:1.7;margin:0">確定していない注文（入力中・未確定）があります。このまま移動すると入力内容は破棄されます。よろしいですか？</p>
+      <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap"><button class="btn-b btn-ghost" onclick="navCancel()">編集を続ける</button><button class="btn-b btn-blue" onclick="navSaveDraft()"><i class="far fa-floppy-disk"></i> 一時保存して移動</button><button class="btn-b" style="margin-left:auto;background:#dc2626;color:#fff" onclick="navProceed()">破棄して移動</button></div>
+    </div>
+  </div>
+</div>
+<div class="modal-ov" id="invMailModal">
+  <div class="modal-bx" style="width:560px">
+    <div class="modal-hd"><h3>請求書メール送信</h3><button class="x" onclick="closeInvMail()">×</button></div>
+    <div class="modal-bd">
+      <div class="sms-fld"><label>送信先メールアドレス</label><input id="invMailTo"></div>
+      <div class="sms-fld"><label>件名</label><input id="invMailSubj"></div>
+      <div class="sms-fld" style="margin-bottom:0"><label>本文（編集可）</label><textarea id="invMailBody" style="width:100%;min-height:240px;border:1px solid #d1d5db;border-radius:8px;padding:10px;font-size:13px;line-height:1.7"></textarea></div>
+      <div style="display:flex;gap:8px;margin-top:14px"><button class="btn-b btn-ghost" onclick="closeInvMail()">閉じる</button><button class="btn-b btn-blue" style="margin-left:auto" onclick="invMailSend()"><i class="far fa-paper-plane"></i> メール送信</button></div>
+    </div>
+  </div>
+</div>
+<div class="modal-ov" id="invModal">
+  <div class="modal-bx" style="width:640px">
+    <div class="modal-hd"><h3>自社回収 請求書プレビュー（編集可）</h3><button class="x" onclick="closeInv()">×</button></div>
+    <div class="modal-bd">
+      <div class="inv-paper" id="invPaper"></div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn-b btn-ghost" onclick="closeInv()">閉じる</button><button class="btn-b" style="background:#2b579a;color:#fff;margin-left:auto" onclick="invDownload()"><i class="far fa-file-word"></i> Word DL</button><button class="btn-b btn-blue" onclick="invSms()"><i class="far fa-comment-dots"></i> SMS送信</button><button class="btn-b btn-blue" onclick="invMail()"><i class="far fa-envelope"></i> メール送信</button><button class="btn-b btn-ghost" onclick="invPost()"><i class="fas fa-envelope-open-text"></i> 郵送済み</button></div>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const yen=n=>'¥'+n.toLocaleString();
+const CH={
+  web:{l:'訃報',i:'fa-file-lines',c:'#185fa5',bg:'#e6f1fb'},
+  form:{l:'フォーム',i:'fa-clipboard-list',c:'#0f6e56',bg:'#e1f5ee'},
+  ivr:{l:'IVR',i:'fa-headset',c:'#6d28d9',bg:'#f0ebfe'},
+  phone:{l:'電話',i:'fa-phone',c:'#b45309',bg:'#faeeda'},
+  fax:{l:'FAX',i:'fa-fax',c:'#6d28d9',bg:'#f0ebfe'},
+};
+const ITEM_JP={flower:'供花',things:'供物',message:'弔文',telegram:'弔電',kouden:'香典'};
+const CATM={flower:{l:'供花',c:'#0f6e56',bg:'#e1f5ee'},things:{l:'供物',c:'#b45309',bg:'#faeeda'},message:{l:'弔文',c:'#185fa5',bg:'#e6f1fb'},telegram:{l:'弔電',c:'#6d28d9',bg:'#f0ebfe'},kouden:{l:'香典',c:'#a1174e',bg:'#fbeaf0'}};
+function chBadge(k){const m=CH[k];return `<span class="ch" style="background:${m.bg};color:${m.c}"><i class="fas ${m.i}"></i>${m.l}</span>`;}
+
+// ===== dummy funerals (20) =====
+const NAMES=['糸和 花子','篠田 一郎','山下 大介','鈴木 みつ','田中 健三','佐藤 富子','高橋 誠一','伊藤 スエ','渡辺 昭二','中村 千代','小林 正夫','加藤 房子','吉田 武','山本 キミ','松本 隆','井上 光子','木村 進','林 ハル','清水 勇','森 とし子'];
+const HALLS=['鶴舞会場','パシフィコ横浜','昭和ホール','名東斎場','千種メモリアル','天白会館'];
+const STAFF=['サポート','近藤','佐々木','山本','田口'];
+const CURRENT_STAFF='近藤'; // ログイン中の操作担当者（システム登録）
+const COMPANY_FAX='052-950-0000';
+const BANK_INFO='いとわ葬祭 ／ あいち銀行 鶴舞支店 普通 1234567 口座名義 カ）イトワソウサイ';
+const PRODUCTS=[
+  {id:'f1',cat:'flower',name:'供花（追悼）1対',price:110000},
+  {id:'f2',cat:'flower',name:'供花（追悼）1基',price:55000},
+  {id:'f3',cat:'flower',name:'供花（松）1対',price:66000},
+  {id:'f4',cat:'flower',name:'供花（松）1基',price:33000},
+  {id:'f5',cat:'flower',name:'供花（竹）1対',price:44000},
+  {id:'f6',cat:'flower',name:'供花（竹）1基',price:22000},
+  {id:'f7',cat:'flower',name:'供花（梅）1対',price:33000},
+  {id:'f8',cat:'flower',name:'供花（梅）1基',price:16500},
+  {id:'f9',cat:'flower',name:'枕花',price:10000},
+  {id:'t1',cat:'things',name:'フルーツA',price:10800},
+  {id:'t2',cat:'things',name:'フルーツB',price:16200},
+  {id:'t3',cat:'things',name:'菓子盛り',price:4000},
+  {id:'m1',cat:'message',name:'弔文（追悼メッセージ）',price:2200},
+  {id:'g1',cat:'telegram',name:'弔電（スタンダード）',price:3300},
+  {id:'k1',cat:'kouden',name:'香典',price:10000},
+];
+const CATCODE={flower:'F',things:'K',message:'M',telegram:'D',kouden:'CD'};
+(function(){const cnt={};PRODUCTS.forEach(p=>{const c=CATCODE[p.cat];cnt[c]=(cnt[c]||0)+1;p.code=c+String(cnt[c]).padStart(3,'0');});})();
+const LABELS=['株式会社itowa\n代表取締役 坂元 充','友人一同','鈴木 太郎','〇〇部一同','山田 花子','株式会社大栄社','親族一同','高校同期一同'];
+const PAY={credit:'クレジットカード',invoice:'請求書払い（郵送）',onsite:'会場支払い',bank:'銀行振込'};
+function rng(seed){let t=seed+0x6D2B79F5;return function(){t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,a){return a[Math.floor(r()*a.length)];}
+
+const FUNERALS=NAMES.map((nm,i)=>{
+  const r=rng(i*131+7);
+  const hall=HALLS[i%HALLS.length];
+  const staff=STAFF[i%STAFF.length];
+  const day=24+Math.floor(r()*18); // 07/24 - 08/xx
+  const mo=day>31?8:7; const dd=day>31?day-31:day;
+  const date=`2026/${String(mo).padStart(2,'0')}/${String(dd).padStart(2,'0')}`;
+  const hour=[10,11,12,13,14][Math.floor(r()*5)];
+  const _fd=new Date(2026,mo-1,dd,hour,0);const _wd=new Date(_fd.getTime()-86400000);const _p=x=>String(x).padStart(2,'0');
+  const funeralDisp=`${_p(_fd.getMonth()+1)}/${_p(_fd.getDate())} ${_p(hour)}:00`;const wakeDisp=`${_p(_wd.getMonth()+1)}/${_p(_wd.getDate())} 18:00`;
+  const _BUF=3;const _wdl=new Date(_wd.getFullYear(),_wd.getMonth(),_wd.getDate(),18-_BUF,0);const _fdl=new Date(_fd.getTime()-_BUF*3600000);
+  const wakeDeadline=`${_p(_wdl.getMonth()+1)}/${_p(_wdl.getDate())} ${_p(_wdl.getHours())}:00`;const funeralDeadline=`${_p(_fdl.getMonth()+1)}/${_p(_fdl.getDate())} ${_p(_fdl.getHours())}:00`;
+  // orders
+  const n=Math.floor(r()*8); const orders=[];
+  for(let k=0;k<n;k++){
+    let itemType=pick(r,['flower','flower','flower','things','message','telegram','kouden']);
+    let ch;
+    if(itemType==='kouden'){ch=pick(r,['web','form']);}        // 香典は電話/IVR不可
+    else{ch=pick(r,['web','web','form','phone','phone','ivr']);}
+    const pool=PRODUCTS.filter(p=>p.cat===itemType);
+    const prod=pick(r,pool);
+    let pay;
+    if(itemType==='kouden'){pay='credit';}                      // 香典はカードのみ
+    else if(ch==='phone'||ch==='ivr'){pay=pick(r,['invoice','invoice','onsite','']);} // ''=請求方法未決
+    else{pay=pick(r,['credit','credit','invoice','onsite']);}
+    const st=r()<0.08?'cancel':(r()<0.06?'pend':'ok');
+    orders.push({
+      ch,itemType,orderNo:`202607${String(20+i).padStart(2,'0')}${String(1000+k).slice(1)}`,
+      date:`2026/07/${String(20+Math.floor(r()*6)).padStart(2,'0')}`,
+      itemName:prod.name,label:pick(r,LABELS),price:prod.price,pay,st,
+    });
+  }
+  const hexc='0123456789abcdef';
+  const uuid=Array.from({length:36},(_,j)=>([8,13,18,23].indexOf(j)>=0)?'-':hexc[Math.floor(r()*16)]).join('');
+  const shortCode=Array.from({length:6},()=>'abcdefghijkmnpqrstuvwxyz23456789'[Math.floor(r()*32)]).join('');
+  const funeralCode='2026-'+String(100000+Math.floor(r()*899999));
+  const chief=nm.split(' ')[0]+' '+pick(r,['一郎','恵子','健太','裕子','誠']);
+  const _fx=()=>'052-'+String(200+Math.floor(r()*799))+'-'+String(1000+Math.floor(r()*9000));
+  const faxBase=_fx(),faxHall=_fx();
+  const smsHistory=[];
+  if(r()<0.5)smsHistory.push({ts:`7/${20+Math.floor(r()*5)} 10:30`,name:pick(r,['たなか 様','すずき 様','さとう 様']),ch:'SMS',contact:'08012345678',url:`https://itwa.jp/${shortCode}`,status:'送信済'});
+  return {id:i+1,name:nm,hall,staff,funeralDisp,wakeDisp,soon:(mo===7&&dd<=27),orders,smsHistory,uuid,shortCode,funeralCode,faxBase,faxHall,wakeDeadline,funeralDeadline,chief};
+});
+
+// ===== screen 1: funeral list =====
+function initHallFilter(){const sel=document.getElementById('fHall');HALLS.forEach(h=>{const o=document.createElement('option');o.value=h;o.textContent=h;sel.appendChild(o);});}
+function chCounts(orders){const c={web:0,form:0,ivr:0,phone:0,fax:0};orders.forEach(o=>{if(c[o.ch]!==undefined)c[o.ch]++;});return c;}
+function catCounts(orders){const c={flower:0,things:0,message:0,telegram:0,kouden:0};orders.forEach(o=>{if(c[o.itemType]!==undefined)c[o.itemType]++;});return c;}
+function catChips(orders){
+  if(!orders.length)return '<span class="hint">0件</span>';
+  const c=catCounts(orders);
+  return ['flower','things','message','telegram','kouden'].map(k=>{const n=c[k];const m=CATM[k];return `<span class="ch" style="background:${n?m.bg:'#f3f4f6'};color:${n?m.c:'#c0c4cc'}">${m.l} ${n}</span>`;}).join('');
+}
+let smsFuneral=null;
+let smsChannel='sms';
+let faxKind='individual';
+let faxDest='base';
+let NP_ENABLED=true;
+let npOptOut=false;
+let payMethod='np',pendingOcr=[],curOcrDraftId=null,savedDrafts=[];
+let discountOn=false,discountPct=0,discountYen=0,discMode='pct';
+function subtotal(){return cart.reduce((s,c)=>s+c.price,0);}
+function discountAmt(){return discountOn?Math.max(0,Math.min(subtotal(),Math.round(discountYen))):0;}
+function grandTotal(){return subtotal()-discountAmt();}
+function payReady(){return payMethod==='invoice'?(cart.length>0&&allLabelsFilled()&&ordererReady()):!!npStatus;}
+function confirmOrder(method){
+  const fu=curFuneral;const dest=fu?fu.faxHall:'—';
+  const lb=method==='np'?'NP後払い':'自社回収請求書（Word）';
+  const noDisp=!!(document.getElementById('noDispatch')&&document.getElementById('noDispatch').checked);
+  const confMsg=noDisp?('発注処理をせずに注文を登録します（事後登録）。\n決済方法：'+lb+'\n注文FAXは送信しません。\n登録してよろしいですか？'):('発注を行います。\n決済方法：'+lb+'\n注文FAX送信先（会場受注FAX番号）：'+dest+'\n送信してよろしいですか？');
+  if(!confirm(confMsg))return;
+  let msg=noDisp?('発注処理は行わず、注文を登録しました（事後登録・'+lb+'）。注文リストに反映しました。'):('注文を確定し（'+lb+'）、'+dest+' へ注文FAXを送信しました。注文リストに反映しました。');
+  if(method==='invoice')msg+='\n自社回収請求書（Word）を生成しました。';
+  alert(msg);
+  if(fu){
+    fu.invoices=fu.invoices||[];
+    const on=belongs==='corporation'?(F.companyName.value||'（注文者）'):(((F.sei.value||'')+' '+(F.mei.value||'')).trim()||'（注文者）');
+    const base={id:'inv'+Date.now()+Math.floor(Math.random()*999),ordererName:on,phone:(F.phone.value||''),email:(F.email.value||''),items:cart.map(c=>({name:c.name,code:c.code||'',price:c.price})),discountPct:discountOn?discountPct:0,discountAmt:discountAmt(),total:grandTotal(),done:{sms:false,mail:false,post:false}};
+    const _sfx=noDisp?'（事後登録・発注処理なし）':'';
+    if(method==='invoice')fu.invoices.push(Object.assign(base,{type:'invoice',opLog:[{ts:nowStr(),act:'請求書払い（自社回収）で確定'+_sfx,staff:CURRENT_STAFF}]}));
+    else fu.invoices.push(Object.assign(base,{type:'np',opLog:[{ts:nowStr(),act:'NP後払いで確定（NP済み）'+_sfx,staff:CURRENT_STAFF}]}));
+  }
+  if(curOcrDraftId){pendingOcr=pendingOcr.filter(x=>x.id!==curOcrDraftId);curOcrDraftId=null;}
+  navBypass=true;openOrders(fu?fu.id:1);
+}
+function faxDestNumber(){const f=smsFuneral;if(!f)return '';return faxDest==='base'?f.faxBase:faxDest==='rep'?COMPANY_FAX:f.faxHall;}
+function setFaxDest(d){faxDest=d;document.querySelectorAll('#faxDestTabs button').forEach(b=>b.classList.toggle('on',b.dataset.d===d));document.getElementById('faxDestNo').value=faxDestNumber();fillFax();}
+function switchTab(ch){
+  smsChannel=ch;
+  document.querySelectorAll('#smsTabs button').forEach(b=>b.classList.toggle('on',b.dataset.ch===ch));
+  document.getElementById('fldPhone').style.display=ch==='sms'?'block':'none';
+  document.getElementById('fldEmail').style.display=ch==='email'?'block':'none';
+  document.getElementById('fldFax').style.display=ch==='fax'?'block':'none';
+  const conf={sms:'電話番号の間違いが無いかご確認下さい',email:'メールアドレスの間違いが無いかご確認下さい',fax:'送信先FAX番号の間違いが無いかご確認下さい'};
+  const lbl={sms:'SMS送信',email:'メール送信',fax:'FAX送信'};
+  document.getElementById('smsConf').textContent=conf[ch];
+  document.getElementById('smsSendBtn').textContent=lbl[ch];
+  document.getElementById('smsPreviewBox').style.display=ch==='sms'?'block':'none';
+  document.getElementById('mailComposeBox').style.display=ch==='email'?'block':'none';
+  document.getElementById('faxComposeBox').style.display=ch==='fax'?'block':'none';
+  if(ch==='email')fillMail();
+  if(ch==='fax'){document.querySelectorAll('#faxDestTabs button').forEach(b=>b.classList.toggle('on',b.dataset.d===faxDest));document.getElementById('faxDestNo').value=faxDestNumber();const npr=document.getElementById('npOptRow');if(npr){npr.style.display=NP_ENABLED?'block':'none';document.getElementById('npOptOut').checked=npOptOut;}fillFax();}
+}
+function buildMailTemplate(){
+  const f=smsFuneral;if(!f)return {subject:'',body:''};
+  const name=(document.getElementById('smsName').value.trim())||'〇〇';
+  const fam=f.name.split(' ')[0];
+  const url=shortUrlOf(f);
+  const subject=`【いとわ葬祭】${fam}家 供花・供物ご注文ページのご案内`;
+  const body=`${name} 様
+
+平素より大変お世話になっております。
+いとわ葬祭でございます。
+
+このたびは、${fam}家 御葬儀に際し、供花・供物のご注文を承っております。
+下記の専用ページより、スマートフォン・パソコンから簡単にご注文いただけます。
+ご注文からお支払いまで、Web上で完結いたします。
+
+▼ ご注文ページ
+${url}
+
+━━━━━━━━━━━━━━━━
+■ 会場：${f.hall}
+■ 通夜：${f.wakeDisp}
+■ 葬儀：${f.funeralDisp}
+━━━━━━━━━━━━━━━━
+
+ご不明な点がございましたら、下記までお気軽にお問い合わせください。
+何卒よろしくお願い申し上げます。
+
+────────────────
+いとわ葬祭
+TEL：050-8884-4987
+────────────────`;
+  return {subject,body};
+}
+function fillMail(){const t=buildMailTemplate();document.getElementById('mailSubject').value=t.subject;document.getElementById('mailBody').value=t.body;}
+function buildFax(kind){
+  const f=smsFuneral;if(!f)return '';
+  const nm=(document.getElementById('smsName').value.trim())||'〇〇';
+  const to=kind==='corporation'?`${nm} 御中`:`${nm} 様`;
+  const fam=f.name.split(' ')[0];
+  const url=shortUrlOf(f);
+  const fcode=f.funeralCode;
+  const retFax=(document.getElementById('faxDestNo')&&document.getElementById('faxDestNo').value.trim())||faxDestNumber()||'—';
+  const useNp=NP_ENABLED&&!npOptOut;
+  const payLine=useNp?'☐ 請求書払い（NP後払い・郵送）　　☐ 会場支払い':'☐ 請求書払い（葬儀社回収・お振込）　　☐ 会場支払い';
+  const npNote=useNp?'<div class="fax-note">※ 請求書払いをご選択の場合、NP後払いの与信審査を株式会社ネットプロテクションズが行います。ご請求方法は追って電話にてご確認いたします。</div>':'';
+  const wdl=f.wakeDeadline,fdl=f.funeralDeadline;
+  const deadlineBlock=(wdl===fdl)?`<div class="fax-sec">■ ご注文締切時間</div><div class="fax-note">締切：${wdl} まで（この時間までにご注文ください）</div>`:`<div class="fax-sec">■ ご注文締切時間</div><div class="fax-note">通夜：${wdl} まで ／ 葬儀：${fdl} まで（各締切時間までにご注文ください）</div>`;
+  const nafuda=[1,2,3].map(n=>`<div class="fax-nafuda"><div class="fn-code">商品コード：__________</div><div class="fn-vert"><span class="fn-label">名札（お名前）記入欄 ${n}</span></div></div>`).join('');
+  const ordererRows=kind==='corporation'?`<tr><th>会社名</th><td></td></tr><tr><th>ご担当者</th><td></td></tr><tr><th>電話</th><td></td></tr><tr><th>住所</th><td></td></tr>`:`<tr><th>お名前</th><td></td></tr><tr><th>電話</th><td></td></tr><tr><th>住所</th><td></td></tr>`;
+  const items=PRODUCTS.filter(p=>!NOBIZ.includes(p.cat));
+  const MAXFAX=13;const shown=items.slice(0,MAXFAX);const hidden=items.length-shown.length;
+  const itemRows=shown.map(p=>`<tr><td style="text-align:center">${p.code}</td><td>${p.name}</td><td style="text-align:right">${yen(p.price)}</td></tr>`).join('');
+  const moreNote=hidden>0?`<div class="fax-note">※ 上記のほか ${hidden} 件の商品がございます。掲載しきれない商品は下記QRコード（注文ページ）よりご確認いただけます。</div>`:'';
+  const bankNote=!useNp?`<div class="fax-bank">■ 請求書払い（葬儀社回収）お振込先：${BANK_INFO}</div>`:'';
+  const page1=`<div class="fax-paper"><div class="fax-hd"><div class="fax-title">供花・供物 ご注文FAX</div><div class="fax-sub">【ご記入・ご返信用】この用紙にご記入のうえ、ご返信ください</div></div><div class="fax-to">${to}</div><p>${fam}家 御葬儀の供花・供物ご注文用紙です。2枚目の商品コードをご記入のうえ、返信先FAXへご返信ください。</p><table class="fax-info"><tr><th>葬家名</th><td>${fam}家</td><th>会場</th><td>${f.hall}</td></tr><tr><th>通夜</th><td>${f.wakeDisp}</td><th>葬儀</th><td>${f.funeralDisp}</td></tr></table><div class="fax-sec">■ ご注文内容（最大3件／商品コードは2枚目をご参照ください）</div><div class="fax-nafuda-row">${nafuda}</div><div class="fax-note">※ ご夫婦、またはご夫婦とお子様のお名前を連名で記載される場合、姓（苗字）はお一人分のみで結構です。</div><div class="fax-sec">■ お支払い方法（いずれかにチェック）</div><div class="fax-pay">${payLine}</div>${npNote}<div class="fax-sec">■ ご注文者</div><table class="fax-orderer">${ordererRows}</table><div class="fax-footer-row"><div class="fax-footer-qr"><div id="faxCodeQr"></div><div class="fax-sort-cap">注文商品の確認・Web注文はこちら</div></div><div class="fax-footer-note">★ 左のQRコードから、<b>ご注文可能な商品の確認</b>と<b>そのままWebでのご注文（カード決済も可）</b>ができます。ご返信は<b>この用紙のみ</b>をお送りください（システムが自動で仕分けします）。QRが切れたり隠れたりしないよう、用紙全体が確実に写るようお送りください。</div></div><div class="fax-ft">返信先FAX：${retFax}　いとわ葬祭　TEL 050-8884-4987　（ご記入用紙 1/2）</div></div>`;
+  const page2=`<div class="fax-paper" style="margin-top:14px"><div class="fax-hd"><div class="fax-title">ご注文可能な商品一覧</div><div class="fax-sub">【商品一覧・ご返信不要】ご注文の商品コードを1枚目にご記入ください</div></div><table class="fax-items"><thead><tr><th style="width:96px">商品コード</th><th>商品名</th><th style="width:110px;text-align:right">税込金額</th></tr></thead><tbody>${itemRows}</tbody></table>${moreNote}${deadlineBlock}<div class="fax-qr-row"><div class="fax-qr" id="faxQr"></div><div class="fax-qr-cap"><b>注文可能な商品はこちら</b><br>スマホ・PCからもご注文いただけます<br><b>スマホ・PCからはカード決済もご利用いただけます。</b><br>${url}</div></div>${bankNote}<div class="fax-ft">いとわ葬祭　TEL 050-8884-4987 ／ 返信先FAX ${retFax}　（商品一覧 2/2）</div></div>`;
+  return page1+page2;
+}
+function fillFax(){
+  document.getElementById('faxPaper').innerHTML=buildFax(faxKind);
+  const f=smsFuneral;const url=shortUrlOf(f);
+  const EC=(window.QRCode&&QRCode.CorrectLevel)?QRCode.CorrectLevel:null;
+  const q1=document.getElementById('faxQr');
+  if(q1){q1.innerHTML='';try{if(window.QRCode){new QRCode(q1,{text:url,width:96,height:96,correctLevel:EC?EC.M:undefined});}else{q1.textContent='[QR]';}}catch(e){q1.textContent='[QR]';}}
+  const q2=document.getElementById('faxCodeQr');
+  if(q2&&f){q2.innerHTML='';try{if(window.QRCode){new QRCode(q2,{text:f.funeralCode,width:96,height:96,correctLevel:EC?EC.H:undefined});}else{q2.textContent='[QR]';}}catch(e){q2.textContent='[QR]';}}
+}
+function sendSms(id){openSms(id);}
+function shortUrlOf(f){return f?`https://itwa.jp/${f.shortCode}`:'https://itwa.jp/xxxxxx';}
+function composeSms(){
+  const name=(document.getElementById('smsName').value.trim())||'〇〇';
+  const fam=smsFuneral?smsFuneral.name.split(' ')[0]:'〇〇';
+  const short=shortUrlOf(smsFuneral);
+  const body=`${name}様\n${fam}家注文ページ\n${short}\nいとわ葬祭`;
+  return {body,short};
+}
+function updateSmsPreview(){
+  const r=composeSms();
+  document.getElementById('smsPreview').textContent=r.body;
+  const n=r.body.length;
+  const seg=n<=70?'1通（70文字以内）':(n<=670?Math.ceil(n/67)+'通（長文SMS）':'上限超過');
+  document.getElementById('smsCount').textContent=`文字数：約${n}文字 ／ ${seg}　※短縮URL ${r.short.length}文字で計算（改行は各1文字換算）`;
+  const nm=document.getElementById('smsName').value;
+  const ok=/^[ぁ-んァ-ヶー\u3000\s]*$/.test(nm);
+  document.getElementById('smsNameWarn').style.display=(nm&&!ok)?'block':'none';
+  if(smsChannel==='email')fillMail();
+  if(smsChannel==='fax')fillFax();
+}
+function openSms(id){smsFuneral=FUNERALS.find(f=>f.id===id);faxDest='base';npOptOut=false;document.getElementById('smsName').value='';document.getElementById('smsPhone').value='';document.getElementById('smsEmail').value='';document.getElementById('smsUrlFull').textContent=`https://biz.itowa71.com/${smsFuneral.uuid}/order-form`;switchTab('sms');updateSmsPreview();document.getElementById('smsModal').classList.add('show');}
+function closeSms(){document.getElementById('smsModal').classList.remove('show');}
+function copyUrl(){const r=composeSms();alert('短縮URLをコピーしました：\n'+r.short+'\n（実ページ：'+document.getElementById('smsUrlFull').textContent+'）');}
+function submitSms(){
+  const name=document.getElementById('smsName').value.trim();
+  const map={sms:'SMS',email:'メール',fax:'FAX'};
+  const cval={sms:'smsPhone',email:'smsEmail',fax:'smsFax'};
+  const emptyMsg={sms:'電話番号を入力してください',email:'メールアドレスを入力してください',fax:'送信先FAX番号を入力してください'};
+  const contact=document.getElementById(cval[smsChannel]).value.trim();
+  if(!contact){alert(emptyMsg[smsChannel]);return;}
+  const r=composeSms();
+  const now=new Date();const ts=`${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  smsFuneral.smsHistory=smsFuneral.smsHistory||[];
+  smsFuneral.smsHistory.unshift({ts,name:name||'（未入力）',ch:map[smsChannel],contact,url:r.short,status:'送信済'});
+  closeSms();
+  alert(map[smsChannel]+'を送信しました。注文リスト下部の送信履歴に記録されます。');
+  if(curFuneral&&smsFuneral&&curFuneral.id===smsFuneral.id)renderSmsHistory();
+}
+function renderSmsHistory(){
+  const rows=document.getElementById('sms-rows');const h=(curFuneral&&curFuneral.smsHistory)||[];
+  const cb=c=>c==='メール'?'<span class="ch" style="background:#e1f5ee;color:#0f6e56"><i class="far fa-envelope"></i>メール</span>':c==='FAX'?'<span class="ch" style="background:#faeeda;color:#b45309"><i class="fas fa-fax"></i>FAX</span>':'<span class="ch" style="background:#e6f1fb;color:#185fa5"><i class="far fa-comment-dots"></i>SMS</span>';
+  rows.innerHTML=h.length?h.map(x=>`<tr><td>${x.ts}</td><td>${cb(x.ch||'SMS')}</td><td>${x.name}</td><td>${x.contact||x.phone||''}</td><td class="hint" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x.url}</td><td><span class="status st-ok">${x.status}</span></td></tr>`).join(''):'<tr><td colspan="6" class="hint" style="text-align:center;padding:16px">送信履歴はありません</td></tr>';
+}
+const BASES=[{name:'名古屋東営業所',halls:['名東斎場','千種メモリアル','天白会館']},{name:'横浜営業所',halls:['パシフィコ横浜']}];
+function baseOfHall(h){for(const b of BASES){if(b.halls.includes(h))return b.name;}return '本部';} // 未設定は本部
+let curBase=''; // ''=すべて
+function baseFunerals(){return FUNERALS.filter(f=>!curBase||baseOfHall(f.hall)===curBase);}
+function pendingCount(){return baseFunerals().reduce((a,f)=>a+f.orders.filter(o=>!o.pay).length,0);}
+function setBase(b){curBase=b;renderBaseTabs();renderFuneralList();}
+function renderBaseTabs(){
+  const el=document.getElementById('base-tabs');if(!el)return;
+  const tabs=['','本部',...BASES.map(b=>b.name)];
+  const pc=pendingCount();
+  el.innerHTML=`<div class="basetabs-row">${tabs.map(b=>{const cnt=b===''?FUNERALS.reduce((a,f)=>a+f.orders.filter(o=>!o.pay).length,0):FUNERALS.filter(f=>baseOfHall(f.hall)===b).reduce((a,f)=>a+f.orders.filter(o=>!o.pay).length,0);return `<button class="basetab${curBase===b?' on':''}" onclick="setBase('${b}')">${b===''?'すべて':b}${cnt?'<span class="basedot"></span>':''}</button>`;}).join('')}</div>${pc?`<span class="pending-badge"><i class="fas fa-triangle-exclamation"></i> 未対応有り（${pc}件）</span>`:''}`;
+}
+function renderFuneralList(){
+  renderBaseTabs();
+  renderOcrBanners();
+  const hall=document.getElementById('fHall').value;
+  const fam=(document.getElementById('fFam')?document.getElementById('fFam').value:'').trim();
+  const rows=document.getElementById('funeral-rows');rows.innerHTML='';
+  FUNERALS.filter(f=>(!curBase||baseOfHall(f.hall)===curBase)&&(!hall||f.hall===hall)&&(!fam||f.name.includes(fam))).forEach(f=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><span class="fam" onclick="openOrders(${f.id})">${f.name} 様</span>${f.soon?'<span class="soon">締切間近</span>':''}${funeralIncomplete(f)?'<span class="soon" style="background:#fef3c7;color:#92400e;border-color:#fcd34d">請求未完了あり</span>':''}${f.orders.some(o=>!o.pay)?'<span class="soon" style="background:#fff1e6;color:#b45309;border-color:#fdba74">未対応有り</span>':''}</td>
+      <td>${f.hall}</td><td>${f.staff}</td><td>${f.wakeDisp}</td><td>${f.funeralDisp}</td>
+      <td><div class="cnt-chips">${catChips(f.orders)}</div></td>
+      <td><div class="row-act"><button class="mini" onclick="openOrders(${f.id})">注文リスト</button><button class="mini" onclick="sendSms(${f.id})"><i class="far fa-paper-plane"></i> 送信</button><button class="mini phone" onclick="openProxy(${f.id})"><i class="fas fa-phone"></i> 注文作成</button></div></td>`;
+    rows.appendChild(tr);
+  });
+}
+
+// ===== screen 2: order list =====
+let curFuneral=null;
+function openOrders(id){curFuneral=FUNERALS.find(f=>f.id===id);go('orders');
+  document.getElementById('ord-crumb').textContent=`${curFuneral.name}家 注文リスト`;
+  document.getElementById('ord-title').textContent=`${curFuneral.name}家 注文リスト`;
+  document.getElementById('ord-proxy-btn').onclick=()=>openProxy(id);
+  document.getElementById('ord-sms-btn').onclick=()=>openSms(id);
+  {const oc=document.getElementById('obi-card');const u=curFuneral.uuid;oc.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="fas fa-file-lines" style="color:#2563eb;font-size:18px"></i><div><div style="font-weight:600;font-size:14px">訃報ページ（参列者向け・新型 /memorial/）</div><div class="hint" style="font-family:monospace;font-size:11px">app.itowa71.com/memorial/'+u+'</div></div><button class="btn-b btn-blue" style="margin-left:auto" onclick="window.open(\'https://app.itowa71.com/memorial/'+u+'\',\'_blank\')"><i class="fas fa-arrow-up-right-from-square"></i> 訃報ページを開く</button></div>';}
+  renderAgg();renderOrderRows();renderSmsHistory();renderInvManage();renderOpLog();
+}
+function renderAgg(){
+  const o=curFuneral.orders;const total=o.filter(x=>x.st!=='cancel').reduce((s,x)=>s+x.price,0);
+  const c=chCounts(o);
+  const chipHtml=Object.keys(c).map(k=>`<span class="ch" style="background:${CH[k].bg};color:${CH[k].c}"><i class="fas ${CH[k].i}"></i>${CH[k].l} ${c[k]}</span>`).join('');
+  document.getElementById('agg').innerHTML=`
+    <div class="box"><div class="lb">注文数（集約）</div><div class="vl">${o.length}<span style="font-size:13px;font-weight:400"> 件</span></div></div>
+    <div class="box"><div class="lb">合計金額</div><div class="vl">${yen(total)}</div></div>
+    <div class="box" style="grid-column:span 2"><div class="lb">動線内訳</div><div class="brk">${chipHtml}</div></div>`;
+}
+function renderOrderRows(){
+  const q=(document.getElementById('ordSearch').value||'').trim();
+  const rows=document.getElementById('order-rows');rows.innerHTML='';
+  let list=curFuneral.orders;
+  if(q)list=list.filter(o=>o.itemName.includes(q)||o.label.includes(q));
+  if(!list.length){rows.innerHTML='<tr><td colspan="9" class="hint" style="text-align:center;padding:20px">注文データがありません</td></tr>';return;}
+  list.forEach(o=>{
+    const stH=o.st==='cancel'?'<span class="status st-cancel">キャンセル済</span>':o.st==='pend'?'<span class="status st-pend">申請中</span>':'<span class="status st-ok">受付済</span>';
+    const tr=document.createElement('tr');
+    if(o.st==='cancel')tr.style.opacity='.55';
+    tr.style.cursor='pointer';tr.title='クリックで作成・詳細画面へ';tr.onclick=()=>openProxy(curFuneral.id);
+    tr.innerHTML=`<td>${chBadge(o.ch)}</td><td>${ITEM_JP[o.itemType]}</td><td>${o.date}</td><td>${o.orderNo}</td>
+      <td>${o.itemName}</td><td>${o.label.split('\n').map(l=>`<div>${l}</div>`).join('')}</td>
+      <td style="text-align:right">${o.price.toLocaleString()}</td><td>${PAY[o.pay]||'<span style=\'color:#b45309;font-weight:600\'>未対応（請求方法未決）</span>'}</td><td>${stH}</td>`;
+    rows.appendChild(tr);
+  });
+}
+
+// ===== screen 3: proxy order =====
+let cart=[],curCat='all',npStatus=null,belongs='individual';
+const PROD_IMG='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5Ojf/2wBDAQoKCg0MDRoPDxo3JR8lNzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzf/wAARCACgAKADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3GiiigAooooAKKKKACiiigAoorF1K/uGuZbSLMKoBucfefI/h9B79fpUVKkaceaRUIuTsjaormLHU3gijltZPtdtIwAQNvzk4+Vvr26fSunpUqsaiuhzg4OzCiiitCAooooAKKKKACiiigAooooAKKKKACiiigAooooAK5DxeLyR7uHTg4uZIUVJEYDyz83zdRn6d66+uV8RxXU9/JFaTLBvVBLLjLqvzfc7bvc9K5sV/DNqHxnOeAYmstMh0+aNllhugSwO9GBkHRxkE+o7HtXptcJo9lcaXLBYokbaekqGCTdiRcuMq4x8x6ndnJ788nu6nCO8ZPzHXVml5BRRRXWYBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAVyXitrZJ7h7yeeGJVjJaB2Vj97gbeTXVu6oAXYDJwM1yPiuy/tG9WHzliTfG7MX2kqu7O0+vIrmxNnCxrRdplDQJ9OnuM6fLds3mQs63EkjcFuCNxPXB6eld/Xmlktn4f1Pdc38Qt5BAsIkcs+FkZiW7AfPgY4wK9EuZykAaDa7MQqZPBJqMLKKg2v60HXkronoqlZR3/ml7yaPbjiNF4/OrtdUZcyvaxgncKKKKoYUUUUAFFFFABRRRQAUUUUAFFFFAEUtxDEdskiK2MhSeT+FYdl4s0ySF3ubuGLYdpMh8sseuArc+31FXtW+weZGLuJpJm4VUzuIrhvGFnp2o/ubG0L3kmBa/MVJPGQc9u9cdbEOErafeRKainpr/XQ7JLuO8hmuI7lJlZdpt2AzEGHAOOQTx1rG1vToNWkge8vEglACraqAd6jk7fz6+lcrpsGr+FU1G4Wxe5mdVgeeY/KHB/hH3mG0/wCcV0d20w1C01a3R7ou2JolO1UQqASobp0BwfSseeSmpX/ruRGo301H/wBlquqtHPaRXayKpV5IQxXH8J659vas2fUrq1tri3s4dkNtOywxMGRicg8jGe5x2wK2NBmuNTvGv1V7WGMgIkihmkbkEDB6fhWuyyzy3U1rb263kkQVHlOQuM/ex7ntROK0jtcqa5tiHT9SWy0yBpbK5WaYqWU87mOeA3Q9P5VtQXUE5KxSozAAsoYEr9a8ueXVbJ531OG9ScqqW0RYyQyPuwPXkDJx7V6Pb3tkttFK5SF2jXKuAHA9COtdNOasrOy7PcqMo20/r+v6saFFNRldFdCCrDII7inV0lBRRRQAUUUUAFFFFABRRRQAVHNPFAu6aREGCfmOOnJqSuY17Q7m8vheSS+bBGM+SqfNgcgL7nAGf9pvapnJpXSuJuxU1/xBpdjJPdRSC8uGizGM/u16DqOvXPHbmsHwpqT3Wtq1/HHJJOEW3jtpAViwCS+cZ6468jPeql9Ddw29vaDM91AS00EaCTDFNwjKD+EDqemTWR4cjkbxZBppkiRnnxMVGMfKSyAH8j7158r9UtX53/IwnJdN/n/X5/5el6++oQ2jRadCtxPdTCHeG+4cZJPHAqyLdJbO1tL7MMkCqsxhYgMdvY9SCf1rnpdB1G2sbyBZUEcU/wC4lSUxnaecnryM4/DitWPVIoZJYb22mjjEKrBOrmRnJyCT3Bzjmny2glF2737f8Oa9OaRBdtqFg6rolm80ka/u4JmG4jGMknnAzWXY6lr1/p1/aaxbxx3bb3WZFAVBtOBnPtXXxmeCVETzZJPLC7pgCx75yOO3SuY8V20oYppkt1JcIwkkidgqRjA9ucgDgZ9aE1r5EyTepVvrfVLzRdLuLEvJJ5vmL5W2QIFBwFBxk9RkjB611Xh3TpPsbSap5M9y0rNkLygP8Le45qO2vFxakCCGWS3EoQHHy9yBx696qalrUVlaTW9hcLHOGLGbZuWRmBI59/XnGMUUqkbtzQ1Za3OrAAGAMClrktN8b2clwltfAwFuBKxAU9B6/U56DpXWAhgCpBB5BHeu6E4zV4lqSewtFFFWMKKKKACiiigAooooAKzPEOsQaJpkt3NyQPkQdWNadeb+NY9d1a4Ktpkv9nI6hV3H5x6lemfTj8qmTsjOpJxjpucfqPiLW7e+udWniVrYxbJYnbDFc7giyJyRk5z17HPfW+Hep2j3nm31m99fXrDy7toQoj4yep7E9QOawdU8M6pfCcG3ux5SoYE2MBkruIwO+3H5+1SSDUfBVlNC1sBczqCJDKHaD5cfdxwCT39Mc4rjqN2ONSe76Hoeo6rpl61xY/bb5HhjWVJ4oHYPgkH/AHvTn86p6LMZdMgvtl1NLJMU2yx5IcNwPQAEDn1FZ/w+1GIeHrnUNQ1aD7bI7o7SsqBAOR8owerZz3rR1XVJPCmgQplbiSZWSBkIUE4yG56jOPrmsI0+U64yctbl7V9dl0oE3Sz3Etwfle3/AOWSqM5xxz7Va+2wrbNql1cr5MiKA0wC7OMDP19a4Wz8ZbdNl+1wPcXUuRggeWAQeMdRj9fWq9/PLq1sbKFRFbybdwC56AZwD0q09bN69hc9rpbrvoS69cQfaJp9HuYM3kQijKXG9mO4bl65Xt+tNtBaancGwsJHiu/J/djedkmI8HAJyTuyMe9VbmWDStOLWtpa7HMW9RGDIJ8M2R1wNoXIznJ96r2cU1pZO1yvkagJgsiMyos+3GQxwcjoTngnrVSoxk0zmlU97Y6DUPCGry3F3Jp1s6BJmZo5eVkUiNgAO4yH4r0Twn9uTSEh1OOVJ4js/eADK9sYqxoF5Lf6TBcTm2MjD5vs0m9B9Dj0rRrrhTUdUdcIJe8gooorU0CiiigAooooAKKKKACiiigArzz4l6bexaPIYbwtaPiMxSszOWJOPmz0GOBg9TXodZfiPTH1ewWzVlVWkUuzdlHXHvUTjzKxFSPNFo+fG0O5dYhDbiViGTdGN2WH/wCv9K3V8I3Vzp4N2Lhnt1DQxlyM98AZ4PTuOR3r1+TSba3e0ggQKu1wW7s2F5PvhaVtJHaoVFGEMLFbng8drcnWnWINKJyHG2MqQQPugdun6V0j6XIjojK6JOSqK4+fIHPY+pr05NAt45fNSGNZOfmCgH86bdaJBcyR28oI3xyDePvJwBke+SD+FZVMO53lJ6mipPVt6sk0bw1pdrokVn9lDxvtkcSdS/XPsfpUepeDNHv5pbh4Ctw53b9xOD9D7/yroVBCgMckDk+tLXSopKxpyRatYy/DWmPo+kxWUriR4yd0g/j98dq1KKKpKw0rKyCiiigYUUUUAFFFFABRRRQAUUUUAFFFFAFe8R2jWSJd0kTB1X+92I/EE1HHqdo65Eo9weCD6EdjVyue8RRRfa4WRFEpRi7AcnkAZ/WgDWbUbRVLGZQB1NJZv9qla7AIjK7IsjGR1LfQ8flWVa6WIrm0muAkiMxG1hkA4JB/SuhoAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiio7iQxQSSKu4opYL64FAD3ZUQu7BVUZJPQCsAhtQ1HfghSQcHso6f1P41ZurW8ukWT7Qk0ZwQiDav175/GrGnx+Qu3yJAx+8xxzQBZuYTLblEIDjBQnsw5H60ttMs8QcDB6Mp6qe4NSAk9RioZbYNIZYnaKXGCy9G+o70AT0VXs5nmjfeVYo5XegwGx3/p+FWKACiiigAooooAKKKKACiiigAooooAKKKKACiiigCs1lbliyqY2PUxMUz+VJ9kI+7dXCj/fB/mDVqigCt9kY9bu4P/AlH8hSfYYD/rPMk9pJGYflnFWqKAEVVRQqgKo4AAwBS0UUAFFFFABRRRQAUUUUAf/Z';
+const F={};
+function openProxy(id){
+  const f=FUNERALS.find(x=>x.id===id);curFuneral=f;go('proxy');
+  document.getElementById('fam-init').textContent=f.name.slice(0,1);
+  document.getElementById('fam-name').textContent=f.name+' 様';
+  document.getElementById('fam-meta').textContent=`${f.hall} ／ 葬儀日 ${f.funeralDisp} ／ 担当：${f.staff}`;
+  document.getElementById('memo-fam').textContent=f.name+' 様';
+  document.getElementById('memo-sub').textContent=`${f.hall} ／ ${f.funeralDisp}`;
+  document.getElementById('proxy-crumb-order').textContent=`${f.name}家 注文リスト`;
+  document.getElementById('proxy-crumb-order').onclick=()=>openOrders(id);
+  // reset
+  cart=[];curCat='all';npStatus=null;belongs='individual';curOcrDraftId=null;payMethod='np';discountOn=false;discountPct=0;discountYen=0;discMode='pct';
+  {const dc=document.getElementById('discChk');if(dc)dc.checked=false;const db=document.getElementById('discBody');if(db)db.style.display='none';const dp=document.getElementById('discPct');if(dp)dp.value='0';const dy=document.getElementById('discYen');if(dy)dy.value='0';}
+  document.querySelectorAll('#belongs button').forEach((b,i)=>b.classList.toggle('on',i===0));
+  {const rb=document.querySelector('input[name="pm"][value="np"]');if(rb)rb.checked=true;document.querySelectorAll('.pay-opt').forEach(o=>o.classList.toggle('on',o.dataset.pm==='np'));const npp=document.getElementById('npPanel'),ivp=document.getElementById('invPanel');if(npp)npp.style.display='block';if(ivp)ivp.style.display='none';}
+  document.querySelectorAll('.corp').forEach(el=>el.style.display='none');
+  document.querySelectorAll('[data-f]').forEach(inp=>inp.value='');
+  document.querySelectorAll('.cat').forEach(c=>c.classList.toggle('on',c.dataset.cat==='all'));
+  document.getElementById('kouden-note').classList.add('hide');
+  renderProducts();renderCart();renderLabels();recompute();
+}
+
+function renderProducts(){
+  const grid=document.getElementById('prod-grid');grid.innerHTML='';
+  const note=document.getElementById('kouden-note');
+  if(NOBIZ.includes(curCat)){grid.innerHTML='';const msg=curCat==='kouden'?'香典はカード決済のみのため、電話注文では承れません。':curCat==='telegram'?'弔電は佐川商品のため、bizからは注文できません。':'弔文は今回、bizからは注文できません。';note.innerHTML='<i class="fas fa-circle-info"></i> '+msg+'Web・注文フォームからのご案内をお願いします。';note.classList.remove('hide');return;}
+  note.classList.add('hide');
+  PRODUCTS.filter(p=>!NOBIZ.includes(p.cat)&&(curCat==='all'||p.cat===curCat)).forEach(p=>{
+    const el=document.createElement('div');el.className='prod';
+    el.innerHTML=`<div class="ph"><i class="fas fa-seedling"></i></div><div class="cat-l">${ITEM_JP[p.cat]}</div><div class="nm">${p.name}</div><div style="font-size:11px;color:#94a3b8;margin:2px 0">商品コード：${p.code}</div><div class="pr">${yen(p.price)}</div><button>カートに追加</button>`;
+    el.querySelector('button').onclick=()=>addToCart(p);grid.appendChild(el);
+  });
+}
+document.querySelectorAll('.cat').forEach(c=>c.onclick=()=>{
+  document.querySelectorAll('.cat').forEach(x=>x.classList.remove('on'));c.classList.add('on');curCat=c.dataset.cat;renderProducts();
+});
+function addToCart(p){cart.push({uid:'u'+Date.now()+Math.random().toString(36).slice(2,6),name:p.name,price:p.price,label:emptyLabel()});resetNp();renderCart();renderLabels();recompute();}
+function removeFromCart(uid){cart=cart.filter(c=>c.uid!==uid);resetNp();renderCart();renderLabels();recompute();}
+function renderCart(){
+  const box=document.getElementById('memo-items');
+  let h=cart.length?cart.map(c=>`<div class="memo-item"><span>${c.name}</span><span>${yen(c.price)} <span class="rm" onclick="removeFromCart('${c.uid}')">×</span></span></div>`).join(''):'<div class="empty-hint" style="font-size:12px">商品未選択</div>';
+  if(cart.length&&discountOn&&discountAmt()>0)h+=`<div class="memo-item"><span style="color:#dc2626">会員値引き（${discountPct}%）</span><span style="color:#dc2626">-${yen(discountAmt())}</span></div>`;
+  box.innerHTML=h;
+  document.getElementById('memo-total').textContent=yen(grandTotal());document.getElementById('bar-total').textContent=yen(grandTotal());
+}
+const CORP_TYPES=['株式会社','有限会社','合資会社','合名会社','（記載なし）'];
+const TITLES=['代表取締役社長','代表取締役','取締役社長','代表取締役会長','会長','社長','専務取締役','常務取締役','取締役','執行役員','支店長','部長','課長','所長','代表','理事長','（記載なし）','その他（自由入力）'];
+const QUICK=['子供一同','孫一同','親族一同','兄弟一同','姉妹一同','友人一同','家一同'];
+const LBLBG=['#eff6ff','#f0fdf4','#fefce8','#fdf2f8','#f5f3ff','#ecfeff'];
+const LBLBD=['#3b82f6','#22c55e','#eab308','#ec4899','#8b5cf6','#06b6d4'];
+const NOBIZ=['kouden','telegram','message'];
+const CORP_QUICK=['有志一同','社員一同','部一同','一同'];
+const TITLE_QUICK=['代表取締役社長','代表取締役','会長','社長','専務取締役','常務取締役','取締役','執行役員','代表'];
+const MAX_NAMES=8;
+function esc(x){return (x||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function emptyLabel(){return {kind:'individual',withRelation:false,names:[{relation:'',name:'',isCouple:false}],corps:[{type:'株式会社',company:'',title:'代表取締役',name:''}],note:''};}
+function labelFilled(l){return l.kind==='individual'?l.names.some(n=>n.name.trim()):l.corps.some(c=>c.company.trim()||c.name.trim());}
+function composeLabel(l){
+  if(l.kind==='individual'){const parts=[];l.names.forEach(n=>{if(n.name.trim())parts.push((n.relation?n.relation+' ':'')+n.name.trim());});return parts.join(' ／ ');}
+  return l.corps.map(c=>{const title=(c.title||'').trim();const type=c.type==='（記載なし）'?'':c.type;return [type+c.company.trim(),title,c.name.trim()].filter(Boolean).join(' ');}).filter(Boolean).join(' ／ ');
+}
+function splitSurname(nm){const g=Array.from(nm);const idx=g.findIndex(ch=>ch===' '||ch==='　');if(idx>0)return [idx,g.slice(0,idx).join(''),g.slice(idx+1).join('')];return [0,'',nm];}
+function fudaGlyphs(str,fontPx){return Array.from(str).map(ch=>(ch===' '||ch==='　')?`<span style="display:block;height:${Math.round(fontPx*0.5)}px"></span>`:`<span style="display:block;font-size:${fontPx}px;line-height:1.12">${esc(ch)}</span>`).join('');}
+function fudaSpacer(px){return px>0?`<span style="display:block;height:${Math.round(px)}px"></span>`:'';}
+function fudaHtml(l){
+  const bodyH=250, innerW=150, LH=1.15;
+  const wrap=rows=>`<div class="fuda"><div class="fuda-hd"><span>御</span><span>供</span></div><div class="fuda-body">${rows}</div></div>`;
+  const empty=wrap('<div class="fuda-row"><div class="fuda-col" style="color:#bbb;font-size:12px">名義未入力</div></div>');
+  const clen=x=>Array.from(x).length;
+  let specs=[];
+  if(l.kind==='individual'){
+    const es=l.names.filter(n=>n.name.trim()).map(n=>{const nm=n.name.trim();const r=n.isCouple?[0,'',nm]:splitSurname(nm);return {relation:l.withRelation?(n.relation||'').trim():'',surnameLen:r[0],surname:r[1],given:r[2]};});
+    const withSur=es.filter(e=>e.surnameLen>0);const maxLen=withSur.length?Math.max(...withSur.map(e=>e.surnameLen)):0;
+    specs=es.map(e=>{
+      let head=e.surname,tail=e.given,gapU=0;
+      if(e.surnameLen>0){gapU=0.5+(maxLen-e.surnameLen);}
+      else if(maxLen>0){head='';gapU=maxLen+0.5;}
+      else{head='';gapU=0;}
+      const relU=l.withRelation?(e.relation?clen(e.relation)*0.44+0.3:0.44+0.3):0;
+      return {t:'name',relation:e.relation,head,gapU,tail,units:relU+clen(head)+gapU+clen(tail)};
+    });
+  }else{
+    l.corps.forEach(c=>{const type=c.type==='（記載なし）'?'':c.type;const title=(c.title||'').trim();const org=type+c.company.trim();const name=c.name.trim();if(!org&&!name)return;if(org)specs.push({t:'org',text:org,units:clen(org)*0.72});if(name||title)specs.push({t:'cname',title,name,units:(title?clen(title)*0.44+0.3:0)+clen(name)});});
+  }
+  if(!specs.length)return empty;
+  let rows;
+  if(l.kind==='individual'){const N=specs.length;if(N<=4)rows=[specs];else{const top=Math.ceil(N/2);rows=[specs.slice(0,top),specs.slice(top)];}}
+  else rows=[specs];
+  const numRows=rows.length;
+  const maxColUnits=Math.max(1,...specs.map(s=>s.units));
+  const maxCols=Math.max(...rows.map(r=>r.length));
+  const nfH=bodyH*0.9/(numRows*maxColUnits*LH);
+  const nfW=innerW/(maxCols*1.35);
+  let NF=Math.round(Math.min(nfH,nfW));NF=Math.max(12,Math.min(40,NF));
+  const OF=Math.round(NF*0.72),TF=Math.round(NF*0.44);
+  const renderCol=s=>{
+    if(s.t==='org')return `<div class="fuda-col">${fudaGlyphs(s.text,OF)}</div>`;
+    if(s.t==='cname'){let inner='';if(s.title)inner+=fudaGlyphs(s.title,TF)+fudaSpacer(NF*0.3);inner+=fudaGlyphs(s.name,NF);return `<div class="fuda-col">${inner}</div>`;}
+    let inner='';
+    if(l.kind==='individual'&&l.withRelation)inner+=(s.relation?fudaGlyphs(s.relation,TF)+fudaSpacer(NF*0.3):fudaSpacer(Math.round(TF*LH+NF*0.3)));
+    if(s.head)inner+=fudaGlyphs(s.head,NF);
+    if(s.gapU>0)inner+=fudaSpacer(s.gapU*NF*LH);
+    inner+=fudaGlyphs(s.tail,NF);
+    return `<div class="fuda-col">${inner}</div>`;
+  };
+  const rowsHtml=rows.map(r=>`<div class="fuda-row">${r.map(renderCol).join('')}</div>`).join('');
+  return wrap(rowsHtml);
+}
+function renderLabels(){
+  const box=document.getElementById('label-list');
+  if(!cart.length){box.innerHTML='<div class="empty-hint">商品を追加すると、ここに名札の入力欄が表示されます。</div>';return;}
+  box.innerHTML='';
+  cart.forEach((c,ci)=>{
+    const l=c.label;const b=document.createElement('div');b.className='lbl-block';b.style.background=LBLBG[ci%LBLBG.length];b.style.borderLeft='4px solid '+LBLBD[ci%LBLBD.length];
+    let f=`<div style="font-size:12px;font-weight:600;margin-bottom:4px">お名前の種類</div><div class="toggle" style="margin-bottom:10px"><button data-kind="individual" class="${l.kind==='individual'?'on':''}">個人</button><button data-kind="corporate" class="${l.kind==='corporate'?'on':''}">法人</button></div>`;
+    if(l.kind==='individual'){
+      f+=`<label style="font-size:12px;display:flex;gap:6px;align-items:center;margin-bottom:8px"><input type="checkbox" class="cb-rel" ${l.withRelation?'checked':''}> 続柄を付ける（親族など）</label>`;
+      l.names.forEach((n,i)=>{
+        f+=`<div style="border:1px solid #eef0f3;border-radius:8px;padding:8px;margin-bottom:8px">`;
+        f+=`<div style="font-size:11px;color:#6b7280;margin-bottom:4px">よく使う名義（ワンタップ）</div><div class="chips" style="margin-bottom:8px">${QUICK.map(q=>`<span class="chip q-chip" data-row="${i}">${q}</span>`).join('')}</div>`;
+        if(i>0)f+=`<label style="font-size:12px;display:flex;gap:6px;align-items:center;margin-bottom:6px"><input type="checkbox" class="cb-couple" data-i="${i}" ${n.isCouple?'checked':''}> 夫婦（名のみ入力）</label>`;
+        if(l.withRelation)f+=`<div class="fld" style="margin-bottom:6px"><label>続柄</label><input class="in-rel" data-i="${i}" value="${esc(n.relation)}" placeholder="長男"></div>`;
+        const nl=n.isCouple?`名（${i+1}人目）`:(i===0?'氏名':`氏名（${i+1}人目・改行）`);
+        f+=`<div class="fld" style="margin-bottom:0"><label>${nl}</label><input class="in-name" data-i="${i}" value="${esc(n.name)}" placeholder="${n.isCouple?'花子':'山田 太郎'}"></div></div>`;
+      });
+      f+=`<div style="display:flex;gap:8px;margin-bottom:8px">`;
+      if(l.names.length>1)f+=`<button class="mini btn-rmname">－ 削除</button>`;
+      if(l.names.length<MAX_NAMES)f+=`<button class="mini btn-addname" style="margin-left:auto">＋ 改行追加</button>`;
+      f+=`</div>`;
+    }else{
+      l.corps.forEach((c2,ci)=>{
+        f+=`<div style="border:1px solid #eef0f3;border-radius:8px;padding:8px;margin-bottom:8px"><div style="font-size:11px;color:#6b7280;margin-bottom:6px">団体 ${ci+1}</div>`;
+        f+=`<div style="display:flex;gap:8px;margin-bottom:8px"><div class="fld" style="width:128px;margin-bottom:0"><label>会社種別</label><select class="in-ctype" data-c="${ci}">${CORP_TYPES.map(t=>`<option ${c2.type===t?'selected':''}>${t}</option>`).join('')}</select></div><div class="fld" style="flex:1;margin-bottom:0"><label>会社・団体名</label><input class="in-company" data-c="${ci}" value="${esc(c2.company)}" placeholder="〇〇"></div></div>`;
+        f+=`<div style="margin-bottom:8px"><div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">役職・肩書き（よく使う肩書き→編集可）</div><div class="chips" style="margin-bottom:6px">${TITLE_QUICK.map(t=>`<span class="chip tq-chip${c2.title===t?' chip-on':''}" data-c="${ci}">${t}</span>`).join('')}</div><input class="in-title" data-c="${ci}" value="${esc(c2.title)}" placeholder="代表取締役" style="width:100%;border:1px solid #d1d5db;border-radius:6px;padding:7px 9px;font-size:13px"></div>`;
+        f+=`<div style="margin-bottom:0"><div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:4px">お名前（よく使う名義→編集可）</div><div class="chips" style="margin-bottom:6px">${CORP_QUICK.map(q=>`<span class="chip cq-chip${c2.name===q?' chip-on':''}" data-c="${ci}">${q}</span>`).join('')}</div><input class="in-cname" data-c="${ci}" value="${esc(c2.name)}" placeholder="山田 太郎" style="width:100%;border:1px solid #d1d5db;border-radius:6px;padding:7px 9px;font-size:13px"></div></div>`;
+      });
+      f+=`<div style="display:flex;gap:8px;margin-bottom:8px">`;
+      if(l.corps.length>1)f+=`<button class="mini btn-rmcorp">－ 団体を削除</button>`;
+      if(l.corps.length<3)f+=`<button class="mini btn-addcorp" style="margin-left:auto">＋ 団体を追加</button>`;
+      f+=`</div>`;
+    }
+    f+=`<div class="fld" style="margin-bottom:6px"><label><i class="far fa-sticky-note"></i> 備考・メモ（旧漢字・外字・指示など）</label><textarea class="in-note" placeholder="例）「髙」は旧字／「﨑」は立つ崎">${esc(l.note)}</textarea></div>`;
+    f+=`<div class="furigana"><i class="fas fa-tag"></i> 名札プレビュー：<span class="pv">${composeLabel(l)||'—'}</span></div>`;
+    b.innerHTML=`<div class="h"><img src="${PROD_IMG}" class="prod-thumb" alt=""><i class="fas fa-tag" style="color:#2563eb"></i> ${c.name}<span class="lbadge ${labelFilled(l)?'ok':'no'}">${labelFilled(l)?'名札 入力済':'名札 未入力'}</span></div><div class="lbl-2col"><div class="lbl-form">${f}</div><div class="lbl-fuda"><div class="fuda-wrap">${fudaHtml(l)}</div><div class="fuda-note">※こちらはイメージ確認用のサンプル表示です。実際のお名札は名札制作者が配置・書体・バランスを調整して作成します。</div></div></div>`;
+    const wrap=b.querySelector('.fuda-wrap');const pv=b.querySelector('.pv');const badge=b.querySelector('.lbadge');
+    const upd=()=>{pv.textContent=composeLabel(l)||'—';if(wrap)wrap.innerHTML=fudaHtml(l);if(badge){const ok=labelFilled(l);badge.className='lbadge '+(ok?'ok':'no');badge.textContent=ok?'名札 入力済':'名札 未入力';}resetNp();recompute();};
+    b.querySelectorAll('[data-kind]').forEach(btn=>btn.onclick=()=>{l.kind=btn.dataset.kind;resetNp();renderLabels();recompute();});
+    b.querySelectorAll('.q-chip').forEach(chip=>chip.onclick=()=>{l.names[+chip.dataset.row].name=chip.textContent;resetNp();renderLabels();recompute();});
+    b.querySelectorAll('.cq-chip').forEach(chip=>chip.onclick=()=>{l.corps[+chip.dataset.c].name=chip.textContent;resetNp();renderLabels();recompute();});
+    b.querySelectorAll('.tq-chip').forEach(chip=>chip.onclick=()=>{l.corps[+chip.dataset.c].title=chip.textContent;resetNp();renderLabels();recompute();});
+    const rel=b.querySelector('.cb-rel');if(rel)rel.onchange=()=>{l.withRelation=rel.checked;renderLabels();recompute();};
+    b.querySelectorAll('.cb-couple').forEach(cb=>cb.onchange=()=>{l.names[+cb.dataset.i].isCouple=cb.checked;renderLabels();recompute();});
+    b.querySelectorAll('.in-rel').forEach(inp=>inp.oninput=()=>{l.names[+inp.dataset.i].relation=inp.value;upd();});
+    b.querySelectorAll('.in-name').forEach(inp=>inp.oninput=()=>{l.names[+inp.dataset.i].name=inp.value;upd();});
+    b.querySelectorAll('.in-ctype').forEach(el=>el.onchange=()=>{l.corps[+el.dataset.c].type=el.value;upd();});
+    b.querySelectorAll('.in-company').forEach(el=>el.oninput=()=>{l.corps[+el.dataset.c].company=el.value;upd();});
+    b.querySelectorAll('.in-title').forEach(el=>el.oninput=()=>{l.corps[+el.dataset.c].title=el.value;upd();});
+    b.querySelectorAll('.in-cname').forEach(el=>el.oninput=()=>{l.corps[+el.dataset.c].name=el.value;upd();});
+    const ac=b.querySelector('.btn-addcorp');if(ac)ac.onclick=()=>{if(l.corps.length<3){l.corps.push({type:'株式会社',company:'',title:'',name:''});resetNp();renderLabels();recompute();}};
+    const rc=b.querySelector('.btn-rmcorp');if(rc)rc.onclick=()=>{if(l.corps.length>1){l.corps.pop();resetNp();renderLabels();recompute();}};
+    const note=b.querySelector('.in-note');if(note)note.oninput=()=>{l.note=note.value;};
+    const an=b.querySelector('.btn-addname');if(an)an.onclick=()=>{if(l.names.length<MAX_NAMES){l.names.push({relation:'',name:'',isCouple:false});renderLabels();recompute();}};
+    const rn=b.querySelector('.btn-rmname');if(rn)rn.onclick=()=>{if(l.names.length>1){l.names.pop();resetNp();renderLabels();recompute();}};
+    box.appendChild(b);
+  });
+}
+document.querySelectorAll('#belongs button').forEach(btn=>btn.onclick=()=>{
+  document.querySelectorAll('#belongs button').forEach(x=>x.classList.remove('on'));btn.classList.add('on');belongs=btn.dataset.b;
+  document.querySelectorAll('.corp').forEach(el=>el.style.display=belongs==='corporation'?'block':'none');if(belongs==='corporation'){if(F.companyName&&!F.companyName.value)F.companyName.value='株式会社サンプル';}else{if(F.companyName&&F.companyName.value==='株式会社サンプル')F.companyName.value='';}resetNp();recompute();
+});
+document.querySelectorAll('[data-f]').forEach(inp=>{F[inp.dataset.f]=inp;inp.addEventListener('input',()=>{resetNp();recompute();});});
+// 住所マスター（メモリード/zebra連携）モック：郵便番号→丁目候補
+const MG_ADDR_MASTER={'4660064':[{id:'a1',pref:'愛知県',addr1:'名古屋市昭和区鶴舞1丁目'},{id:'a2',pref:'愛知県',addr1:'名古屋市昭和区鶴舞2丁目'},{id:'a3',pref:'愛知県',addr1:'名古屋市昭和区鶴舞3丁目'},{id:'a4',pref:'愛知県',addr1:'名古屋市昭和区鶴舞4丁目'}],'1030028':[{id:'y1',pref:'東京都',addr1:'中央区八重洲1丁目'}],'1040028':[{id:'y2',pref:'東京都',addr1:'中央区八重洲2丁目'}],'5300001':[{id:'c1',pref:'大阪府',addr1:'大阪市北区梅田1丁目'},{id:'c2',pref:'大阪府',addr1:'大阪市北区梅田2丁目'}]};
+// 住所→郵便番号 逆引き（佐川参照）モック：郵便番号単位
+const MG_ADDR_SEARCH=[{zip:'1030028',pref:'東京都',town:'中央区八重洲1丁目'},{zip:'1040028',pref:'東京都',town:'中央区八重洲2丁目'},{zip:'4660064',pref:'愛知県',town:'名古屋市昭和区鶴舞'},{zip:'5300001',pref:'大阪府',town:'大阪市北区梅田'}];
+let mgSearchedZip='';
+function mgFillPA(pref,addr1){const p=document.getElementById('pref'),a=document.getElementById('addr1');if(p)p.value=pref;if(a)a.value=addr1;}
+function mgClearCand(){const w=document.getElementById('mg-cand-wrap');if(w)w.style.display='none';const sel=document.getElementById('mg-cand');if(sel)sel.innerHTML='<option value="">選択してください</option>';mgFillPA('','');}
+function mgSelectAddr(id){const sel=document.getElementById('mg-cand');const opt=sel&&sel.querySelector('option[value="'+id+'"]');if(!opt||!id){mgFillPA('','');}else{mgFillPA(opt.dataset.pref,opt.dataset.a1);}if(typeof resetNp==='function')resetNp();if(typeof recompute==='function')recompute();}
+function mgSearchAddr(z){mgSearchedZip=z;const res=MG_ADDR_MASTER[z];const wrap=document.getElementById('mg-cand-wrap'),sel=document.getElementById('mg-cand');if(!res||!res.length){mgClearCand();return;}wrap.style.display='';sel.innerHTML='<option value="">選択してください</option>'+res.map(a=>'<option value="'+a.id+'" data-pref="'+a.pref+'" data-a1="'+a.addr1+'">'+a.pref+a.addr1+'</option>').join('');if(res.length===1){sel.value=res[0].id;mgSelectAddr(res[0].id);}else{mgFillPA('','');}}
+function mgOnZip(v){const z=(v||'').replace(/\D/g,'');if(/^\d{7}$/.test(z)){if(mgSearchedZip!==z)mgSearchAddr(z);}else if(mgSearchedZip){mgSearchedZip='';mgClearCand();}if(typeof resetNp==='function')resetNp();if(typeof recompute==='function')recompute();}
+function mgToggleAddrSearch(){const el=document.getElementById('mg-addr-search');el.style.display=el.style.display==='none'?'':'none';}
+function mgRunAddrSearch(){const q=(document.getElementById('mg-addr-q').value||'').replace(/[\s　]/g,'');const box=document.getElementById('mg-addr-results');if(q.length<2){box.innerHTML='<div class="hint">市区町村＋町名（例：中央区八重洲）で検索してください。</div>';return;}const r=MG_ADDR_SEARCH.filter(x=>(x.pref+x.town).replace(/[\s　]/g,'').includes(q));box.innerHTML=r.length?r.map(x=>'<div onclick="mgPickAddr(\''+x.zip+'\')" style="border:1px solid #e2ddd2;border-radius:7px;padding:8px 10px;margin-bottom:6px;cursor:pointer;font-size:13px;background:#fff"><b>〒'+x.zip.slice(0,3)+'-'+x.zip.slice(3)+'</b>　'+x.pref+x.town+'</div>').join(''):'<div class="hint">該当する住所が見つかりませんでした。</div>';}
+function mgPickAddr(zip){const zi=document.getElementById('zip');zi.value=zip;mgSearchAddr(zip);document.getElementById('mg-addr-search').style.display='none';if(typeof resetNp==='function')resetNp();if(typeof recompute==='function')recompute();}
+document.getElementById('zip').addEventListener('input',e=>{mgOnZip(e.target.value);});
+function ordererReady(){const need=['sei','mei','phone','zip','pref','addr1','addr2'];const base=need.every(k=>F[k]&&F[k].value.trim());const corp=belongs==='corporation'?(F.companyName&&F.companyName.value.trim()):true;return base&&corp;}
+function allLabelsFilled(){return cart.length>0&&cart.every(c=>labelFilled(c.label));}
+function resetNp(){npStatus=null;document.getElementById('resOk').style.display='none';document.getElementById('resNg').style.display='none';}
+document.getElementById('npBtn').onclick=()=>{
+  const btn=document.getElementById('npBtn');btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> 与信照会中…';
+  setTimeout(()=>{const total=grandTotal();npStatus=total>=200000?'ng':'ok';btn.innerHTML='<i class="fas fa-shield-alt"></i> NP与信確認';
+    document.getElementById('resOk').style.display=npStatus==='ok'?'block':'none';document.getElementById('resNg').style.display=npStatus==='ng'?'block':'none';recompute();},1400);
+};
+document.getElementById('wbtn').onclick=()=>openInvoicePreview();
+function setStep(id,state,label){const el=document.getElementById(id);el.className='step '+state;const ic=state==='done'?'fas fa-circle-check':state==='cur'?'fas fa-dot-circle':'far fa-circle';el.innerHTML=`<i class="${ic}"></i>${label}`;}
+function setSecDone(id,d){document.getElementById(id).classList.toggle('completed',d);}
+function progStep(cls,ic,txt,jump,indent){return `<div class="step ${cls}" ${jump?`data-jump="${jump}"`:''} style="${indent?'padding-left:16px':''}"><i class="${ic}"></i>${txt}</div>`;}
+function renderProg(){
+  const el=document.getElementById('prog-list');if(!el)return;
+  let h=progStep('done','fas fa-circle-check',curFuneral?('故人 '+curFuneral.name+' 様 ／ 喪主 '+curFuneral.chief+' 様'):'葬家','sec-family',false);
+  if(!cart.length)h+=progStep('cur','fas fa-dot-circle','商品 未選択','sec-items',false);
+  cart.forEach((c,i)=>{
+    h+=progStep('done','fas fa-circle-check','商品'+(cart.length>1?(i+1):'')+'：'+c.name,'sec-items',false);
+    const d=labelFilled(c.label);
+    h+=progStep(d?'done':'cur',d?'fas fa-circle-check':'fas fa-dot-circle','名札 '+(d?'入力済':'未入力'),'sec-label',true);
+  });
+  const oOk=ordererReady(),allL=allLabelsFilled(),pOk=payReady();
+  h+=progStep(oOk?'done':((cart.length&&allL)?'cur':''),oOk?'fas fa-circle-check':((cart.length&&allL)?'fas fa-dot-circle':'far fa-circle'),'注文者情報 '+(oOk?'入力済':'未入力'),'sec-orderer',false);
+  h+=progStep(pOk?'done':((oOk&&allL&&cart.length)?'cur':''),pOk?'fas fa-circle-check':((oOk&&allL&&cart.length)?'fas fa-dot-circle':'far fa-circle'),'決済 '+(pOk?'完了':'未'),'sec-payment',false);
+  el.innerHTML=h;
+  el.querySelectorAll('.step[data-jump]').forEach(st=>st.onclick=()=>{const t=document.getElementById(st.dataset.jump);if(t)t.scrollIntoView({behavior:'smooth',block:'center'});});
+}
+function renderBanner(){
+  const el=document.getElementById('pbanner');if(!el)return;
+  const total=cart.length,labelDone=cart.filter(c=>labelFilled(c.label)).length,allL=total>0&&labelDone===total;
+  const pill=(txt,ok,warn)=>`<span class="ppill ${ok?'ok':(warn?'warn':'')}">${ok?'<i class="fas fa-circle-check"></i>':'<i class="far fa-circle"></i>'} ${txt}</span>`;
+  el.innerHTML=(curFuneral?`<span style="font-weight:700;font-size:12px;color:var(--ink)">故人 ${curFuneral.name} 様 ／ 喪主 ${curFuneral.chief} 様</span><span style="color:#cbd5e1">｜</span>`:'')+`<span style="font-weight:700;font-size:12px;color:var(--muted);margin-right:2px">進捗</span>`+pill('商品 '+total+'件',total>0)+pill('名札 '+labelDone+'/'+total+' 完了',allL,total>0&&labelDone<total)+pill('注文者情報',ordererReady())+pill('決済',payReady());
+}
+function recompute(){
+  const hasItems=cart.length>0,labelsOk=allLabelsFilled(),ordererOk=ordererReady(),total=grandTotal();
+  if(discountOn&&discMode==='pct'){discountYen=Math.round(subtotal()*(Math.max(0,Math.min(100,discountPct))/100));const dy=document.getElementById('discYen');if(dy&&document.activeElement!==dy)dy.value=discountYen;}
+  {const dl=document.getElementById('discLine');if(dl)dl.innerHTML=discountOn?('会員値引き（'+discountPct+'% ／ '+yen(discountAmt())+'）：<b style="color:#dc2626">-'+yen(discountAmt())+'</b>　商品小計 '+yen(subtotal())+' → お支払い '+yen(grandTotal())):'';}
+  renderProg();renderBanner();
+  {const on=belongs==='corporation'?((F.companyName&&F.companyName.value.trim())||''):(((F.sei&&F.sei.value.trim())||'')+' '+((F.mei&&F.mei.value.trim())||'')).trim();const mf=document.getElementById('memo-fam');if(mf)mf.textContent=on?on+' 様':'注文者名 未入力';}
+  setSecDone('sec-items',hasItems);setSecDone('sec-label',labelsOk);setSecDone('sec-orderer',ordererOk);setSecDone('sec-payment',payReady());
+  const npBtn=document.getElementById('npBtn'),npReady=hasItems&&labelsOk&&ordererOk;
+  npBtn.disabled=!npReady;document.getElementById('npNote').textContent=npReady?'必須項目が揃いました。与信確認できます':'必須項目（名札・注文者情報）を入力してください';
+  const bar=document.getElementById('barBtn'),warn=document.getElementById('bar-warn');document.getElementById('bar-total').textContent=yen(total);
+  if(!hasItems){warn.textContent='商品を追加してください';bar.textContent='NP与信確認 →';bar.disabled=true;bar.className='primary';}
+  else if(!labelsOk){warn.textContent='名札を入力してください';bar.textContent='NP与信確認 →';bar.disabled=true;bar.className='primary';}
+  else if(!ordererOk){warn.textContent='注文者情報を入力してください';bar.textContent='NP与信確認 →';bar.disabled=true;bar.className='primary';}
+  else if(payMethod==='invoice'){warn.textContent='自社回収請求書で確定できます';bar.textContent='自社回収請求書（Word）で確定';bar.disabled=false;bar.className='primary confirm';bar.onclick=()=>confirmOrder('invoice');}
+  else if(!npStatus){warn.textContent='与信確認へ進めます';bar.textContent='NP与信確認 →';bar.disabled=false;bar.className='primary';bar.onclick=()=>document.getElementById('npBtn').click();}
+  else if(npStatus==='ok'){warn.textContent='与信OK。確定方法を選べます';bar.textContent='NP後払いで確定';bar.disabled=false;bar.className='primary confirm';bar.onclick=()=>confirmOrder('np');}
+  else{warn.textContent='与信NG。自社回収請求書で確定してください';bar.textContent='自社回収請求書（Word）で確定';bar.disabled=false;bar.className='primary';bar.onclick=()=>{payMethod='invoice';const rb=document.querySelector('input[name="pm"][value="invoice"]');if(rb)rb.checked=true;document.querySelectorAll('.pay-opt').forEach(o=>o.classList.toggle('on',o.dataset.pm==='invoice'));document.getElementById('npPanel').style.display='none';document.getElementById('invPanel').style.display='block';confirmOrder('invoice');};}
+}
+document.querySelectorAll('.step').forEach(s=>s.onclick=()=>{const t=document.getElementById(s.dataset.jump);document.querySelectorAll('.sec').forEach(x=>x.classList.remove('focus'));t.classList.add('focus');t.scrollIntoView({behavior:'smooth',block:'center'});});
+
+// ===== router =====
+let ocrDrafts=[];
+function openOcr(){ocrDrafts=[];document.getElementById('ocrStep1').style.display='block';document.getElementById('ocrStep2').style.display='none';document.getElementById('ocrStep3').style.display='none';document.getElementById('ocrModal').classList.add('show');}
+function closeOcr(){document.getElementById('ocrModal').classList.remove('show');}
+function ocrImport(){
+  const pool=PRODUCTS.filter(p=>!NOBIZ.includes(p.cat));
+  const indNames=['山田 太郎','友人一同','鈴木 花子','親族一同'];
+  const n=2+Math.floor(Math.random()*2);
+  for(let i=0;i<n;i++){
+    const fu=FUNERALS[Math.floor(Math.random()*FUNERALS.length)];
+    const prod=pool[Math.floor(Math.random()*pool.length)];
+    const kind=Math.random()<0.5?'法人':'個人';
+    const orderer={company:kind==='法人'?'株式会社サンプル':'',name:kind==='法人'?'サンプル 太郎':'佐藤 花子',phone:'0312345678',zip:'4660064',address:'愛知県名古屋市昭和区鶴舞1-2-32',email:''};
+    const label=kind==='法人'?(orderer.company+' 社員一同'):indNames[Math.floor(Math.random()*indNames.length)];
+    pendingOcr.push({id:'ocr'+Date.now()+Math.random().toString(36).slice(2,6),funeralId:fu.id,funeral:fu.name.split(' ')[0]+'家',funeralCode:fu.funeralCode,cat:prod.cat,code:prod.code,item:prod.name,price:prod.price,label,kind,orderer});
+  }
+  closeOcr();renderFuneralList();
+  alert(n+'件を取り込みました。注文管理一覧の上部「未確定」バナーから、1件ずつ内容を確認して確定してください。');
+}
+function renderOcrBanners(){
+  const el=document.getElementById('ocr-banners');if(!el)return;
+  let h='';
+  if(pendingOcr.length)h+='<div style="font-weight:600;font-size:13px;margin-bottom:6px;color:#92400e"><i class="fas fa-triangle-exclamation"></i> OCR取込・未確定（'+pendingOcr.length+'件）— クリックで注文作成へ（取込内容を反映）</div>'+pendingOcr.map(d=>`<div class="ocr-banner" onclick="openOcrDraft('${d.id}')"><b>${d.funeral}</b> ／ ${d.item} ／ 名札：${d.label} <span class="hint" style="margin-left:6px">訃報NO ${d.funeralCode}</span><i class="fas fa-angle-right" style="margin-left:auto"></i></div>`).join('');
+  if(savedDrafts.length)h+='<div style="font-weight:600;font-size:13px;margin:'+(pendingOcr.length?'10px':'0')+' 0 6px;color:#1d4ed8"><i class="far fa-floppy-disk"></i> 一時保存（下書き）（'+savedDrafts.length+'件）— クリックで再開</div>'+savedDrafts.map(d=>`<div class="ocr-banner" style="background:#eff6ff;border-color:#93c5fd" onclick="openSavedDraft('${d.id}')"><b>${d.funeral}</b> ／ 商品${d.cart.length}件 ／ 一時保存<i class="fas fa-angle-right" style="margin-left:auto"></i></div>`).join('');
+  el.innerHTML=h;
+}
+function openOcrDraft(id){
+  const d=pendingOcr.find(x=>x.id===id);if(!d)return;
+  openProxy(d.funeralId);curOcrDraftId=id;
+  const prod=PRODUCTS.find(p=>p.code===d.code);if(prod)addToCart(prod);
+  if(cart.length){const l=cart[0].label;
+    if(d.kind==='法人'){l.kind='corporate';l.corps=[{type:'株式会社',company:d.orderer.company||'',title:'',name:'社員一同'}];}
+    else{l.kind='individual';l.names=[{relation:'',name:d.label,isCouple:false}];}
+  }
+  if(d.kind==='法人'){belongs='corporation';document.querySelectorAll('#belongs button').forEach((b,i)=>b.classList.toggle('on',i===1));document.querySelectorAll('.corp').forEach(el=>el.style.display='block');if(F.companyName)F.companyName.value=d.orderer.company||'';}
+  const nm=(d.orderer.name||'').split(/\s+/);
+  if(F.sei)F.sei.value=nm[0]||'';if(F.mei)F.mei.value=nm[1]||'';
+  if(F.phone)F.phone.value=d.orderer.phone||'';
+  if(F.zip)F.zip.value=d.orderer.zip||'';
+  if(F.addr2)F.addr2.value=d.orderer.address||'';
+  renderLabels();recompute();
+}
+function renderOcrList(){
+  document.getElementById('ocrCount').textContent=ocrDrafts.filter(d=>d.include).length;
+  document.getElementById('ocrList').innerHTML=ocrDrafts.map((d,i)=>`<div style="border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px;${d.include?'':'opacity:.5'}"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap"><label style="font-size:12px;display:flex;align-items:center;gap:6px"><input type="checkbox" ${d.include?'checked':''} onchange="ocrToggle(${i})"> 発注する</label><span class="ch" style="background:#e6f1fb;color:#185fa5">${d.funeral}</span><span class="hint">訃報NO ${d.funeralCode}（QR判定）</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px"><div><span class="hint">商品</span> ${d.code} ${d.item}（¥${d.price.toLocaleString()}）</div><div><span class="hint">区分/支払</span> ${d.kind} / ${d.pay}</div><div style="grid-column:1/-1"><span class="hint">名札(OCR)</span> <input value="${d.label}" onchange="ocrEdit(${i},this.value)" style="width:70%;border:1px solid #d1d5db;border-radius:6px;padding:5px 8px;font-size:13px"></div><div style="grid-column:1/-1"><span class="hint">注文者(OCR)</span> ${d.kind}${d.kind==='法人'?'／'+d.orderer.company:''}　<input value="${d.orderer.name}" onchange="ocrEditOrderer(${i},'name',this.value)" style="width:32%;border:1px solid #d1d5db;border-radius:6px;padding:5px 8px;font-size:13px"> <input value="${d.orderer.phone}" onchange="ocrEditOrderer(${i},'phone',this.value)" style="width:26%;border:1px solid #d1d5db;border-radius:6px;padding:5px 8px;font-size:13px"></div><div style="grid-column:1/-1"><span class="hint">住所</span> ${d.orderer.address}　<span class="hint">メール</span> ${d.orderer.email||'（任意・未入力）'}</div></div></div>`).join('');
+}
+function ocrEditOrderer(i,field,v){ocrDrafts[i].orderer[field]=v;}
+function ocrToggle(i){ocrDrafts[i].include=!ocrDrafts[i].include;renderOcrList();}
+function ocrEdit(i,v){ocrDrafts[i].label=v;}
+function ocrToConfirm(){
+  const inc=ocrDrafts.filter(d=>d.include);
+  if(!inc.length){alert('発注する明細がありません');return;}
+  document.getElementById('ocrConfirmList').innerHTML=inc.map(d=>`<div style="border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:13px"><b>${d.funeral}</b>　${d.item}　${d.label}<br><span class="hint">注文者：</span>${d.kind==='法人'?d.orderer.company+' ':''}${d.orderer.name}　<span class="hint">支払：</span>${d.pay}<br><span class="hint">注文FAX送信先（会場受注FAX番号）：</span><b>${d.faxHall}</b>${d.pay.includes('NP')?'<br><span class="hint">請求書払い → NP与信を実施し、NGの場合は請求書(Word)を生成します。</span>':''}</div>`).join('');
+  document.getElementById('ocrStep2').style.display='none';
+  document.getElementById('ocrStep3').style.display='block';
+}
+function ocrBack(){document.getElementById('ocrStep3').style.display='none';document.getElementById('ocrStep2').style.display='block';}
+function ocrFinalize(){
+  const inc=ocrDrafts.filter(d=>d.include);
+  let ngCount=0;
+  inc.forEach(d=>{
+    if(d.pay.includes('NP')&&d.price>=200000)ngCount++;
+    const fu=FUNERALS.find(f=>f.id===d.funeralId);
+    if(fu)fu.orders.unshift({ch:'fax',itemType:d.cat,orderNo:'OCR'+Math.floor(Math.random()*100000),date:'2026/07/25',itemName:d.item,label:d.label,price:d.price,pay:d.pay.includes('NP')?'invoice':'onsite',st:'ok'});
+  });
+  closeOcr();
+  const npCount=inc.filter(d=>d.pay.includes('NP')).length;
+  let msg=inc.length+'件を発注しました。各葬家の会場受注FAX番号へ注文FAXを送信し、注文リストに反映しました。';
+  if(npCount)msg+='\n請求書払い '+npCount+'件はNP与信を実施'+(ngCount?('、うち'+ngCount+'件は与信NGのため請求書(Word)を生成しました。'):'（全件OK）。');
+  alert(msg);
+  if(curFuneral){renderOrderRows();renderAgg();}
+  renderFuneralList();
+}
+let curScreen='list',navBypass=false,pendingNav=null;
+let curInv=null;
+function nowStr(){const d=new Date();return (d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function invPaperHtml(name,items,dPct,dAmt,total,famName){
+  let rows=items.map(c=>`<tr><td>${c.name}</td><td style="text-align:right">${yen(c.price)}</td></tr>`).join('');
+  if(dAmt>0)rows+=`<tr><td style="color:#dc2626">会員値引き（${dPct}%）</td><td style="text-align:right;color:#dc2626">-${yen(dAmt)}</td></tr>`;
+  return `<div class="inv-hd"><div style="font-size:18px;font-weight:700;text-align:center;letter-spacing:4px">御 請 求 書</div></div><div style="display:flex;justify-content:space-between;align-items:flex-end;margin:10px 0"><div style="font-size:15px"><span contenteditable class="inv-edit">${name}</span> 様</div><div style="text-align:right;font-size:12px">発行日 ${nowStr().split(' ')[0]}<br><b>いとわ葬祭</b><br>TEL 050-8884-4987</div></div><table class="inv-tbl"><thead><tr><th>品目</th><th style="width:130px;text-align:right">金額（税込）</th></tr></thead><tbody>${rows}<tr><td style="font-weight:700">合計</td><td style="text-align:right;font-weight:700">${yen(total)}</td></tr></tbody></table><div style="margin-top:12px;font-size:13px">■ お振込先：${BANK_INFO}</div><div style="margin-top:8px;font-size:13px">■ 備考：${famName?famName+' 御葬儀 供花・供物代':''}</div><div class="hint" style="margin-top:10px">※ このプレビューで編集できるのは宛名のみです（振込先・備考は固定）。</div>`;
+}
+function openInvoicePreview(){
+  curInv=null;
+  const on=belongs==='corporation'?((F.companyName.value||'（会社名）')):(((F.sei.value||'')+' '+(F.mei.value||'')).trim()||'（注文者名）');
+  const fam=curFuneral?curFuneral.name.split(' ')[0]+'家':'';
+  document.getElementById('invPaper').innerHTML=invPaperHtml(on,cart.map(c=>({name:c.name,price:c.price})),discountPct,discountAmt(),grandTotal(),fam);
+  document.getElementById('invModal').classList.add('show');
+}
+function openInvoiceManage(invId){
+  const inv=((curFuneral&&curFuneral.invoices)||[]).find(x=>x.id===invId);if(!inv)return;
+  curInv=inv;const fam=curFuneral?curFuneral.name.split(' ')[0]+'家':'';
+  document.getElementById('invPaper').innerHTML=invPaperHtml(inv.ordererName,inv.items,inv.discountPct,inv.discountAmt,inv.total,fam);
+  document.getElementById('invModal').classList.add('show');
+}
+function closeInv(){document.getElementById('invModal').classList.remove('show');}
+function invPhoneVal(){return (curInv?curInv.phone:((document.getElementById('invPhone')&&document.getElementById('invPhone').value)||''))||'';}
+function invEmailVal(){return (curInv?curInv.email:((F.email&&F.email.value)||''))||'';}
+function refreshInvCards(){if(curFuneral){renderInvManage();renderOpLog();}}
+function invLog(act){if(curInv){curInv.opLog.push({ts:nowStr(),act,staff:CURRENT_STAFF});refreshInvCards();}}
+function invComplete(inv){return inv.type==='np'||inv.done.sms||inv.done.mail||inv.done.post;}
+function invStatusText(inv){if(inv.type==='np')return 'NP済み';const a=[];if(inv.done.sms)a.push('SMS送信済み');if(inv.done.mail)a.push('メール送信済み');if(inv.done.post)a.push('郵送済み');return a.length?a.join(' ・ '):'未完了';}
+function funeralIncomplete(f){return (f.invoices||[]).some(inv=>!invComplete(inv));}
+function invDownload(){invLog('Wordファイルをダウンロード（未送信扱い）');alert('請求書（Word）をダウンロードしました。DLのみは「未送信」扱いです。');}
+function invSms(){const ph=invPhoneVal().trim();if(!ph){alert('SMS送信先（スマホ・携帯電話）を入力してください。注文者情報の電話番号が自動反映されます。');return;}if(confirm('SMSで送信しますか？\n送信先：'+ph+'\n請求書PDFのダウンロードリンクをSMSで送信します。')){if(curInv)curInv.done.sms=true;invLog('SMS送信（'+ph+'）');alert('請求書PDFのSMSを送信しました：'+ph);}}
+function invPost(){if(!curInv){alert('確定後（注文リストの請求書管理）に「郵送済み」を記録できます。');return;}if(curInv)curInv.done.post=true;invLog('郵送済み');alert('郵送済みにしました。');}
+function invMail(){
+  const fam=curFuneral?curFuneral.name.split(' ')[0]+'家':'';
+  const name=curInv?curInv.ordererName:(belongs==='corporation'?(F.companyName.value||'（会社名）'):(((F.sei.value||'')+' '+(F.mei.value||'')).trim()||'（注文者名）'));
+  const total=curInv?curInv.total:grandTotal();
+  document.getElementById('invMailTo').value=invEmailVal();
+  document.getElementById('invMailSubj').value='【いとわ葬祭】御請求書のご送付'+(fam?'（'+fam+'）':'');
+  document.getElementById('invMailBody').value=name+' 様\n\n平素より大変お世話になっております。いとわ葬祭でございます。\nこのたびは'+fam+' 御葬儀に際し、供花・供物のご注文を賜り誠にありがとうございます。\n\n御請求書を添付（PDF）にてお送りいたします。ご査収のほどお願い申し上げます。\n\n■ ご請求金額：'+yen(total)+'\n■ お振込先：'+BANK_INFO+'\n\nご不明な点がございましたら下記までお問い合わせください。\n何卒よろしくお願い申し上げます。\n\n────────────\nいとわ葬祭\nTEL 050-8884-4987\n────────────';
+  document.getElementById('invMailModal').classList.add('show');
+}
+function closeInvMail(){document.getElementById('invMailModal').classList.remove('show');}
+function invMailSend(){const to=(document.getElementById('invMailTo').value||'').trim();if(!to){alert('送信先メールアドレスを入力してください');return;}if(!confirm('メールで送信しますか？\n送信先：'+to))return;if(curInv)curInv.done.mail=true;invLog('メール送信（'+to+'）');closeInvMail();alert('請求書メールを送信しました：'+to);}
+function renderInvManage(){
+  const el=document.getElementById('inv-manage-card');if(!el)return;
+  const invs=(curFuneral&&curFuneral.invoices)||[];
+  if(!invs.length){el.style.display='none';el.innerHTML='';return;}
+  el.style.display='block';
+  el.innerHTML='<div style="font-weight:600;font-size:15px;margin-bottom:10px"><i class="far fa-file-lines"></i> 請求・入金 管理</div>'+invs.map(inv=>{const done=invComplete(inv);const bg=done?'#dcfce7':'#fef3c7',cl=done?'#15803d':'#92400e';const tl=inv.type==='np'?'NP後払い':'自社回収請求書';const btn=inv.type==='invoice'?`<button class="mini" style="margin-left:auto" onclick="openInvoiceManage('${inv.id}')"><i class="far fa-file-lines"></i> 請求書・送信/郵送</button>`:'<span class="hint" style="margin-left:auto">NP立替・入金保証</span>';return `<div style="border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><b>${inv.ordererName} 様</b> <span class="hint">${tl}／${yen(inv.total)}</span> <span class="ppill" style="background:${bg};color:${cl}">${invStatusText(inv)}</span>${btn}</div>`;}).join('');
+}
+function renderOpLog(){
+  const el=document.getElementById('oplog-card');if(!el)return;
+  const invs=(curFuneral&&curFuneral.invoices)||[];const logs=[];
+  invs.forEach(inv=>inv.opLog.forEach(o=>logs.push({ts:o.ts,name:inv.ordererName,act:o.act,staff:o.staff||CURRENT_STAFF})));
+  if(!logs.length){el.style.display='none';el.innerHTML='';return;}
+  el.style.display='block';
+  el.innerHTML='<div style="font-weight:600;font-size:15px;margin-bottom:10px"><i class="fas fa-list-check"></i> 操作ログ（請求書）</div><div style="overflow-x:auto"><table class="tb"><thead><tr><th>日時</th><th>担当者</th><th>注文者</th><th>操作内容</th></tr></thead><tbody>'+logs.map(l=>`<tr><td>${l.ts}</td><td>${l.staff||''}</td><td>${l.name} 様</td><td>${l.act}</td></tr>`).join('')+'</tbody></table></div>';
+}
+function go(screen){
+  if(curScreen==='proxy'&&screen!=='proxy'&&!navBypass&&cart.length>0){pendingNav=screen;document.getElementById('navGuard').classList.add('show');return;}
+  navBypass=false;curScreen=screen;
+  ['list','orders','proxy'].forEach(s=>document.getElementById('screen-'+s).classList.toggle('hide',s!==screen));
+  document.getElementById('actionbar').style.display=screen==='proxy'?'flex':'none';
+  document.querySelector('.content').scrollTop=0;window.scrollTo(0,0);
+}
+function navProceed(){navBypass=true;document.getElementById('navGuard').classList.remove('show');const t=pendingNav;pendingNav=null;go(t);}
+function navCancel(){document.getElementById('navGuard').classList.remove('show');pendingNav=null;}
+function navSaveDraft(){saveDraft();navBypass=true;document.getElementById('navGuard').classList.remove('show');const t=pendingNav;pendingNav=null;go(t);renderFuneralList();}
+function saveDraft(){
+  if(!curFuneral)return;
+  const orderer={};document.querySelectorAll('[data-f]').forEach(inp=>{orderer[inp.dataset.f]=inp.value;});
+  savedDrafts.push({id:'dft'+Date.now(),funeralId:curFuneral.id,funeral:curFuneral.name.split(' ')[0]+'家',cart:JSON.parse(JSON.stringify(cart)),orderer,belongs,discountOn,discountPct,discountYen,discMode,payMethod});
+}
+function openSavedDraft(id){
+  const d=savedDrafts.find(x=>x.id===id);if(!d)return;
+  openProxy(d.funeralId);
+  d.cart.forEach(c=>cart.push(JSON.parse(JSON.stringify(c))));
+  belongs=d.belongs;document.querySelectorAll('#belongs button').forEach((b,i)=>b.classList.toggle('on',(i===0&&belongs==='individual')||(i===1&&belongs==='corporation')));document.querySelectorAll('.corp').forEach(el=>el.style.display=belongs==='corporation'?'block':'none');
+  document.querySelectorAll('[data-f]').forEach(inp=>{if(d.orderer[inp.dataset.f]!==undefined)inp.value=d.orderer[inp.dataset.f];});
+  discountOn=d.discountOn;discountPct=d.discountPct;discountYen=d.discountYen;discMode=d.discMode;
+  {const dc=document.getElementById('discChk');if(dc)dc.checked=discountOn;const db=document.getElementById('discBody');if(db)db.style.display=discountOn?'block':'none';const dp=document.getElementById('discPct');if(dp)dp.value=discountPct;const dy=document.getElementById('discYen');if(dy)dy.value=discountYen;}
+  payMethod=d.payMethod;{const rb=document.querySelector('input[name="pm"][value="'+payMethod+'"]');if(rb)rb.checked=true;document.querySelectorAll('.pay-opt').forEach(o=>o.classList.toggle('on',o.dataset.pm===payMethod));document.getElementById('npPanel').style.display=payMethod==='np'?'block':'none';document.getElementById('invPanel').style.display=payMethod==='invoice'?'block':'none';}
+  savedDrafts=savedDrafts.filter(x=>x.id!==id);
+  renderLabels();renderCart();recompute();
+}
+function csvEsc(v){v=(v==null?'':String(v));return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function downloadCsv(fn,rows){const csv=rows.map(r=>r.map(csvEsc).join(',')).join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
+const CSV_HEADER=['確定日時','故人名','喪主名','会場','担当','決済方法','ステータス','注文者名','電話','メール','商品明細(コード)','値引率(%)','値引額','合計','操作ログ'];
+function invRows(fu){return (fu.invoices||[]).map(inv=>{const items=inv.items.map(i=>i.name+'('+(i.code||'-')+') '+yen(i.price)).join(' / ');const oplog=inv.opLog.map(o=>o.ts+' '+o.act).join(' / ');const ts=inv.opLog[0]?inv.opLog[0].ts:'';return [ts,fu.name,fu.chief||'',fu.hall,fu.staff,inv.type==='np'?'NP後払い':'自社回収請求書',invStatusText(inv),inv.ordererName,inv.phone,inv.email,items,inv.discountPct,inv.discountAmt,inv.total,oplog];});}
+function exportOrdersCsv(){const fu=curFuneral;if(!fu)return;const rows=[CSV_HEADER].concat(invRows(fu));if(rows.length===1){alert('確定済みの注文がありません。注文作成で確定するとCSVに反映されます。');return;}downloadCsv(fu.name.split(' ')[0]+'家_注文一覧.csv',rows);}
+function exportAllCsv(){let rows=[CSV_HEADER];FUNERALS.forEach(fu=>{rows=rows.concat(invRows(fu));});if(rows.length===1){alert('確定済みの注文がありません。');return;}downloadCsv('itowa_全注文一覧.csv',rows);}
+// init
+function toKatakana(x){return (x||'').replace(/[ぁ-ん]/g,c=>String.fromCharCode(c.charCodeAt(0)+0x60));}
+[['sei','kanaSei'],['mei','kanaMei']].forEach(pair=>{
+  const se=document.querySelector('[data-f="'+pair[0]+'"]'),de=document.querySelector('[data-f="'+pair[1]+'"]');
+  if(!se||!de)return;let reading='';
+  se.addEventListener('compositionupdate',e=>{if(/^[\u3040-\u309fー\s]*$/.test(e.data))reading=e.data;});
+  se.addEventListener('compositionend',()=>{if(reading){de.value=(de.value||'')+toKatakana(reading);reading='';}});
+  se.addEventListener('input',()=>{if(!se.value)de.value='';});
+});
+document.getElementById('discChk').addEventListener('change',e=>{discountOn=e.target.checked;document.getElementById('discBody').style.display=discountOn?'block':'none';resetNp();renderCart();recompute();});
+document.getElementById('discPct').addEventListener('input',e=>{discMode='pct';discountPct=Math.max(0,Math.min(100,parseFloat(e.target.value)||0));discountYen=Math.round(subtotal()*discountPct/100);const dy=document.getElementById('discYen');if(dy)dy.value=discountYen;resetNp();renderCart();recompute();});
+document.getElementById('discYen').addEventListener('input',e=>{discMode='yen';discountYen=Math.max(0,Math.min(subtotal(),parseFloat(e.target.value)||0));discountPct=subtotal()>0?Math.round(discountYen/subtotal()*1000)/10:0;const dp=document.getElementById('discPct');if(dp)dp.value=discountPct;resetNp();renderCart();recompute();});
+document.querySelectorAll('input[name="pm"]').forEach(r=>r.addEventListener('change',()=>{payMethod=r.value;document.querySelectorAll('.pay-opt').forEach(o=>o.classList.toggle('on',o.dataset.pm===payMethod));document.getElementById('npPanel').style.display=payMethod==='np'?'block':'none';document.getElementById('invPanel').style.display=payMethod==='invoice'?'block':'none';if(payMethod==='invoice'&&F.phone)document.getElementById('invPhone').value=F.phone.value||'';recompute();}));
+initHallFilter();renderFuneralList();go('list');
+document.getElementById('smsName').addEventListener('input',updateSmsPreview);
+document.querySelectorAll('#smsTabs button').forEach(b=>b.onclick=()=>switchTab(b.dataset.ch));
+document.querySelectorAll('#faxKindTabs button').forEach(b=>b.onclick=()=>{faxKind=b.dataset.k;document.querySelectorAll('#faxKindTabs button').forEach(x=>x.classList.toggle('on',x===b));fillFax();});
+document.querySelectorAll('#faxDestTabs button').forEach(b=>b.onclick=()=>setFaxDest(b.dataset.d));
+document.getElementById('faxDestNo').addEventListener('input',fillFax);
+document.getElementById('npOptOut').addEventListener('change',e=>{npOptOut=e.target.checked;fillFax();});
+</script>
+</body>
+</html>
